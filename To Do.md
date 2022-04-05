@@ -10,3 +10,4 @@
  - [ ] Provide a Facility to approve as soon as it's uploaded on Reddit
  - [ ] Provide a Feature to User to Use his credentials for his own Sub-Reddit or Account
  - [ ] Provide Feature for the User to Use this in the most Minimal Way
+ - [ ] Reddit Gifs/Meme Viewer ( As a Optional )
