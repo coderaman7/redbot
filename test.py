@@ -3,6 +3,7 @@
 
 import requests
 import random
+import pyperclip as clip
 
 uri = "https://api.redgifs.com/v2/"
 olduri = "https://api.redgifs.com/v1/"
@@ -23,7 +24,12 @@ def main(tag: str):
     giff = []
     for gif in gifs:
         giff.append(f'{gif["urls"]["hd"]}')
-    return giff[0]
+    if len(giff) <= 1:
+        print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
+    link = str(str(str(giff[0]).replace("thumbs2.", "")).replace("com/", "com/watch/")).replace(".mp4","")
+    clip.copy(link)
+    return link
+    
 
 def default():
     tag = getAllTags()
