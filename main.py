@@ -52,10 +52,7 @@ def openAndPost(title: str, message: str, textMSG: str = None):
         if textMSG != None:
             subreddit.submit(textMSG, url=message, nsfw=True)
         else:
-            someInsta = praw.reddit.models.InlineGif(message, "Some Text")
-            print(type(someInsta))
-            subreddit.submit(title="Some Text", url=someInsta)
-            # subreddit.submit(title, url=message, nsfw = True)
+            subreddit.submit(title, url=message, nsfw = True)
 
 
 if __name__ == "__main__":
