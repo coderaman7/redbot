@@ -9,3 +9,4 @@
  - [ ] Provide a Facility to get a Post from a Subreddit and Post it using the link and Text of the post as my Own
  - [ ] Provide a Facility to approve as soon as it's uploaded on Reddit
  - [ ] Preview on Reddit Mobile App as Uploaded
+ - [ ] Support for Multiple Website's
