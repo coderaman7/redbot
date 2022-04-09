@@ -56,7 +56,8 @@ def openAndPost(title: str, message: str, textMSG: str = None):
 
 
 if __name__ == "__main__":
-    AIORNOT = pg.confirm(f"Do you Want {BOTNAME} to Publish Post on Reddit??", BOTNAME, buttons=["Yes", "No"])
+    AIORNOT = pg.confirm(f"Do you Want {BOTNAME} to Publish Post on Reddit??", BOTNAME, buttons=[
+                         "Yes", "No"])
     if AIORNOT.lower() == 'yes':
         tag = getAllTags()
         videoURL = getVideo(tag)
