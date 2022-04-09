@@ -3,6 +3,9 @@ import praw
 import requests
 import random
 import pymsgbox as pg
+import pyperclip as clip
+
+BOTNAME = "Redditor"
 
 # Official Redgifs search link
 # https://api.redgifs.com/v2/gifs/search?search_text=anime
@@ -23,7 +26,12 @@ def getVideo(tag: str):
     giff = []
     for gif in gifs:
         giff.append(f'{gif["urls"]["hd"]}')
-    return giff[0]
+    if len(giff) <= 1:
+        print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
+    link = str(str(str(giff[0]).replace("thumbs2.", "")).replace(
+        "com/", "com/watch/")).replace(".mp4", "")
+    clip.copy(link)
+    return link
 
 
 def openAndPost(title: str, message: str, textMSG: str = None):
@@ -42,19 +50,20 @@ def openAndPost(title: str, message: str, textMSG: str = None):
         subreddit = reddit.subreddit(i)
         reddit.validate_on_submit = True
         if textMSG != None:
-            subreddit.submit(textMSG, url=message)
+            subreddit.submit(textMSG, url=message, nsfw=True)
         else:
-            subreddit.submit(title, url=message)
+            subreddit.submit(title, url=message, nsfw = True)
 
 
 if __name__ == "__main__":
-    AIORNOT = input("Do you Want to Automatically Post or not?? ( Y/N ) : ")
-    if AIORNOT.lower() == 'y':
+    AIORNOT = pg.confirm(f"Do you Want {BOTNAME} to Publish Post on Reddit??", BOTNAME, buttons=[
+                         "Yes", "No"])
+    if AIORNOT.lower() == 'yes':
         tag = getAllTags()
         videoURL = getVideo(tag)
-        print(f'Posting Video with URL {videoURL} which is under Cateogary {tag}')
+        pg.alert(f'{BOTNAME} is uploading video with Cateogary {tag} with a Video URL of \n {videoURL}')
         openAndPost(tag, videoURL)
-    elif AIORNOT.lower() == 'n':
+    elif AIORNOT.lower() == 'no':
         print('--------------------------Auto Poster on Reddit ( NSFW )--------------------------')
         print('     NOTE: Please do check on the Internet that whatenver cateogary you enter should exist on redgifs')
         cateogary = input("Enter the Cateogary to search and Post on Reddit : ")
@@ -64,4 +73,4 @@ if __name__ == "__main__":
         mess = input("Enter the Message You Want to post with it : ")
         openAndPost(cateogary, videoURL, mess)
     else:
-        print("Entered Input was not Valid")
+        pg.alert(f"The {BOTNAME} was asked to abort.")
