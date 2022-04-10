@@ -42,3 +42,27 @@ def GetUserTag(options: list):
     label2 = Label(root, text=" ")
     label2.pack()
     root.mainloop()
+
+
+def GetRedditTag(options: list):
+    root = Tk()
+    root.geometry("200x200")
+
+    def show():
+        overallText = ""
+        if clicked.get() != "Select the Tag":
+            overallText += clicked.get()
+            label.config(text=clicked.get())
+            label.config(text=clicked.get())
+        clip.copy(overallText)
+        root.destroy()
+        # root.quit()
+        # root.update()
+    clicked = StringVar()
+    clicked.set("Select the Tag")
+    drop = OptionMenu(root, clicked, *options)
+    drop.pack()
+    button = Button(root, text="Next", command=show).pack()
+    label = Label(root, text=" ")
+    label.pack()
+    root.mainloop()
