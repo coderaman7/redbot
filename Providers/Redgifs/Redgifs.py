@@ -64,8 +64,8 @@ class RedGifs:
         for i in subreddits:
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
-            subreddit.submit(title, url=message, nsfw=True)
-            # print(title, message)
+            # subreddit.submit(title, url=message, nsfw=True)
+            print(title, message)
             print(f"Successfully Posted in {i}")
 
     def getBestTag(tags: list):
