@@ -4,6 +4,9 @@ import pyperclip as clip
 import random
 import json
 import praw
+from GraphicalElements.OptionsMenu import GetRedditSub
+
+from test2 import MainFrame
 
 # Official Redgifs search link
 # https://api.redgifs.com/v2/gifs/search?search_text=anime
@@ -29,15 +32,27 @@ class RedGifs:
             giff.append(f'{gif["urls"]["hd"]}')
         if len(giff) <= 1:
             print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
-        linkGen = giff[random.randint(0, len(giff))]
-        link = str(str(str(linkGen).replace("thumbs2.", "")).replace(
-            "com/", "com/watch/")).replace(".mp4", "")
-        clip.copy(linkGen)
-        return link
-
-    def openAndPost(title: str, message: str):
+        currentPath = os.getcwd()
         path = os.path.join(os.getcwd(), "Providers", "Redgifs")
         os.chdir(path)
+        with open("Posted.txt", 'r') as f:
+            data = f.readlines()
+        os.chdir(currentPath)
+        isdiffrent = False
+        gifff = ""
+        while isdiffrent == False:
+            linkGen = giff[random.randint(0, len(giff))]
+            link = str(str(str(linkGen).replace("thumbs2.", "")).replace(
+                "com/", "com/watch/")).replace(".mp4", "")
+            if link in data:
+                isdiffrent = False
+            else:
+                clip.copy(link)
+                gifff = link
+                isdiffrent = True
+        return gifff
+
+    def openAndPost(title: str, message: str):
         with open("redgifs-secret.json", "r") as f:
             creds = json.load(f)
         reddit = praw.Reddit(client_id=creds['client_id'],
@@ -46,11 +61,48 @@ class RedGifs:
                             redirect_uri=creds['redirect_uri'],
                             refresh_token=creds['refresh_token'])
         subreddits = str(creds["subreddits"]).split(",")
+        GetRedditSub(subreddits)
+        subreddits = str(clip.paste()).split("+")[:-1]
+        print(subreddits)
         for i in subreddits:
-            print(i)
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
-            subreddit.submit(title, url=message, nsfw=True)
+            # subreddit.submit(title, url=message, nsfw=True)
+            print(f"Successfully Posted in {i}")
 
     def getBestTag(tags: list):
         return tags[random.randint(0, len(tags))]
+
+    def GetRedditTags():
+        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
+        os.chdir(path)
+        with open("redgifs-secret.json", "r") as f:
+            creds = json.load(f)
+        subreddits = str(creds["gifSubReddit"]).split(",")
+        return list(subreddits)
+
+    def GetFromRedditGif(subReddit: str):
+        Data = requests.get(
+            f"https://www.reddit.com/r/{subReddit}/new/.json", headers={'User-agent': 'GetTheData'}).json()
+        giflist = Data['data']['children']
+        gif = []
+        title = []
+        for gifs in giflist:
+            title.append(gifs["data"]["title"])
+            gif.append(gifs["data"]["url_overridden_by_dest"])
+        isdiffrent = False
+        giff = ""
+        titlef = ""
+        with open("Posted.txt", 'r') as f:
+            data = f.readlines()
+        while isdiffrent == False:
+            randomNumber = random.randint(0, len(gif))
+            randomGif = gif[randomNumber]
+            if randomGif in data:
+                isdiffrent = False
+            else:
+                clip.copy(randomGif)
+                giff = randomGif
+                titlef = title[randomNumber]
+                isdiffrent = True
+        return giff, titlef
