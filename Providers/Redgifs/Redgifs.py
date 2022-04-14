@@ -6,8 +6,6 @@ import json
 import praw
 from GraphicalElements.OptionsMenu import GetRedditSub
 
-from test2 import MainFrame
-
 # Official Redgifs search link
 # https://api.redgifs.com/v2/gifs/search?search_text=anime
 
