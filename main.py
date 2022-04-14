@@ -4,6 +4,7 @@ from Providers.Redgifs import Redgifs
 import pymsgbox as pg
 import pyperclip as clip
 from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
+from test2 import MainFrame
 
 with open('config.json', 'r') as f:
     config = json.load(f)

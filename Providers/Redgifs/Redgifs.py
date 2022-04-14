@@ -4,6 +4,9 @@ import pyperclip as clip
 import random
 import json
 import praw
+from GraphicalElements.OptionsMenu import GetRedditSub
+
+from test2 import MainFrame
 
 # Official Redgifs search link
 # https://api.redgifs.com/v2/gifs/search?search_text=anime
@@ -50,8 +53,6 @@ class RedGifs:
         return gifff
 
     def openAndPost(title: str, message: str):
-        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
-        os.chdir(path)
         with open("redgifs-secret.json", "r") as f:
             creds = json.load(f)
         reddit = praw.Reddit(client_id=creds['client_id'],
@@ -60,10 +61,13 @@ class RedGifs:
                             redirect_uri=creds['redirect_uri'],
                             refresh_token=creds['refresh_token'])
         subreddits = str(creds["subreddits"]).split(",")
+        GetRedditSub(subreddits)
+        subreddits = str(clip.paste()).split("+")[:-1]
+        print(subreddits)
         for i in subreddits:
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
-            subreddit.submit(title, url=message, nsfw=True)
+            # subreddit.submit(title, url=message, nsfw=True)
             print(f"Successfully Posted in {i}")
 
     def getBestTag(tags: list):
