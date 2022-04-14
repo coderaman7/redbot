@@ -29,11 +29,25 @@ class RedGifs:
             giff.append(f'{gif["urls"]["hd"]}')
         if len(giff) <= 1:
             print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
-        linkGen = giff[random.randint(0, len(giff))]
-        link = str(str(str(linkGen).replace("thumbs2.", "")).replace(
-            "com/", "com/watch/")).replace(".mp4", "")
-        clip.copy(linkGen)
-        return link
+        currentPath = os.getcwd()
+        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
+        os.chdir(path)
+        with open("Posted.txt", 'r') as f:
+            data = f.readlines()
+        os.chdir(currentPath)
+        isdiffrent = False
+        gifff = ""
+        while isdiffrent == False:
+            linkGen = giff[random.randint(0, len(giff))]
+            link = str(str(str(linkGen).replace("thumbs2.", "")).replace(
+                "com/", "com/watch/")).replace(".mp4", "")
+            if link in data:
+                isdiffrent = False
+            else:
+                clip.copy(link)
+                gifff = link
+                isdiffrent = True
+        return gifff
 
     def openAndPost(title: str, message: str):
         path = os.path.join(os.getcwd(), "Providers", "Redgifs")
@@ -47,10 +61,10 @@ class RedGifs:
                             refresh_token=creds['refresh_token'])
         subreddits = str(creds["subreddits"]).split(",")
         for i in subreddits:
-            print(i)
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
             subreddit.submit(title, url=message, nsfw=True)
+            print(f"Successfully Posted in {i}")
 
     def getBestTag(tags: list):
         return tags[random.randint(0, len(tags))]
@@ -65,19 +79,26 @@ class RedGifs:
 
     def GetFromRedditGif(subReddit: str):
         Data = requests.get(
-            f"https://www.reddit.com/r/{subReddit}/new/.json").json()
-        print(Data)
-        gifs = Data['data']['children']
-        print(len(gifs))
-        exit()
-        giff = []
-        for gif in gifs:
-            giff.append(f'{gif["urls"]["hd"]}')
-        if len(giff) <= 1:
-            print(
-                "Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
-        linkGen = giff[random.randint(0, len(giff))]
-        link = str(str(str(linkGen).replace("thumbs2.", "")).replace(
-            "com/", "com/watch/")).replace(".mp4", "")
-        clip.copy(linkGen)
-        return link
+            f"https://www.reddit.com/r/{subReddit}/new/.json", headers={'User-agent': 'GetTheData'}).json()
+        giflist = Data['data']['children']
+        gif = []
+        title = []
+        for gifs in giflist:
+            title.append(gifs["data"]["title"])
+            gif.append(gifs["data"]["url_overridden_by_dest"])
+        isdiffrent = False
+        giff = ""
+        titlef = ""
+        with open("Posted.txt", 'r') as f:
+            data = f.readlines()
+        while isdiffrent == False:
+            randomNumber = random.randint(0, len(gif))
+            randomGif = gif[randomNumber]
+            if randomGif in data:
+                isdiffrent = False
+            else:
+                clip.copy(randomGif)
+                giff = randomGif
+                titlef = title[randomNumber]
+                isdiffrent = True
+        return giff, titlef

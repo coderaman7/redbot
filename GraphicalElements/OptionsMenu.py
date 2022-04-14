@@ -1,6 +1,7 @@
 # Import module
 from tkinter import *
 import pyperclip as clip
+from tkinter import ttk
 
 def GetUserTag(options: list):
     root = Tk()
@@ -28,12 +29,13 @@ def GetUserTag(options: list):
     clicked.set("Select the Tag")
     clicked1.set("Select the Tag")
     clicked2.set("Select the Tag")
-    drop = OptionMenu(root, clicked, *options)
+    # drop = OptionMenu(root, clicked, *options)
+    drop = ttk.Combobox(root, textvariable=clicked, values=options)
     drop.pack()
-    drop1 = OptionMenu(root, clicked1, *options)
-    drop1.pack()
-    drop2 = OptionMenu(root, clicked2, *options)
-    drop2.pack()
+    # drop1 = ttk.Combobox(root, textvariable=clicked1, values=options)
+    # drop1.pack()
+    # drop2 = ttk.Combobox(root, textvariable=clicked2, values=options)
+    # drop2.pack()
     button = Button(root, text="Next", command=show).pack()
     label = Label(root, text=" ")
     label.pack()
@@ -60,9 +62,38 @@ def GetRedditTag(options: list):
         # root.update()
     clicked = StringVar()
     clicked.set("Select the Tag")
-    drop = OptionMenu(root, clicked, *options)
+    drop = ttk.Combobox(root, textvariable=clicked, values=options)
     drop.pack()
     button = Button(root, text="Next", command=show).pack()
     label = Label(root, text=" ")
     label.pack()
     root.mainloop()
+
+def GetToPost():
+    root = Tk()
+
+
+    root.geometry("300x200")
+
+    w = Label(root, text='GeeksForGeeks', font="50")
+    w.pack()
+
+    listOfElem = ["elem", "One"]
+
+    var=[]
+    def show(strii: str):
+        altext = label3["text"]
+        label3.config(text=altext+strii)
+    for i in range(0, len(listOfElem)):
+        Checkbutton(root, text=listOfElem[i], variable=var.append(i),command=show(listOfElem[i]),onvalue=1,offvalue=0,height=2,width=10).pack()
+
+    Button(root, text="Next", command=show).pack()
+
+    label3 = Label(root, text=" ")
+    label3.pack()
+
+    mainloop()
+
+
+
+GetToPost()

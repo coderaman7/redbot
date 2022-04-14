@@ -20,7 +20,12 @@ def PostOnRedgifs():
             pg.alert("It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
         elif str(wantToPlay).lower() == 'no':
             clip.copy("")
+        else:
+            pg.alert("Program Exited")
+            exit()
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
+        with open("Posted.txt", 'w') as f:
+            f.write(f'{videoURL}\n')
     elif str(option).lower() == 'no':
         GetUserTag(Redgifs.RedGifs.getAllTags())
         tag = clip.paste()
@@ -34,29 +39,35 @@ def PostOnRedgifs():
                     "It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
             elif str(wantToPlay).lower() == 'no':
                 clip.copy("")
+            elif str(wantToPlay).lower() == 'refresh':
+                clip.copy("")
+            else:
+                exit()
             want = wantToPlay
         TitleOfThePost = pg.prompt(
             "Enter the Title of the Post", "Enter the Title of the Post")
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
+        with open("Posted.txt", 'w') as f:
+            f.write(f'{videoURL}\n')
     elif str(option).lower() == 'from reddit??':
         subreddit = Redgifs.RedGifs.GetRedditTags()
         GetRedditTag(subreddit)
         sub = clip.paste()
-        print(sub)
         want = 'Refresh'
         while want == "Refresh":
-            videoURL = Redgifs.RedGifs.GetFromRedditGif(sub)
+            videoURL, title = Redgifs.RedGifs.GetFromRedditGif(sub)
             wantToPlay = pg.confirm(
-                "Want to Play the Video??", f'Want to Play the Video Under Cateogary of {tag}', buttons=['Yes', 'No', "Refresh"])
+                f"Want to Play the Video with title {title}??", f'Want to Play the Video from Sub-Reddit {sub}', buttons=['Yes', 'No', "Refresh"])
             if str(wantToPlay).lower() == 'yes':
                 pg.alert(
                     "It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
             elif str(wantToPlay).lower() == 'no':
                 clip.copy("")
             want = wantToPlay
-        TitleOfThePost = pg.prompt(
-            "Enter the Title of the Post", "Enter the Title of the Post")
+        TitleOfThePost = title
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
+        with open("Posted.txt", 'w') as f:
+            f.write(f'{videoURL}\n')
     else:
         pg.alert(f"{config['Bot Name']} was exited Abnormally")
 
