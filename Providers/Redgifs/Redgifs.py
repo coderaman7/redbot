@@ -30,12 +30,10 @@ class RedGifs:
             giff.append(f'{gif["urls"]["hd"]}')
         if len(giff) <= 1:
             print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
-        currentPath = os.getcwd()
-        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
-        os.chdir(path)
+        currentPath = RedGifs.RedgifsHome()
         with open("Posted.txt", 'r') as f:
             data = f.readlines()
-        os.chdir(currentPath)
+        RedGifs.home(currentPath)
         isdiffrent = False
         gifff = ""
         while isdiffrent == False:
@@ -51,8 +49,10 @@ class RedGifs:
         return gifff
 
     def openAndPost(title: str, message: str):
+        currentPath = RedGifs.RedgifsHome()
         with open("redgifs-secret.json", "r") as f:
             creds = json.load(f)
+        RedGifs.home(currentPath)
         reddit = praw.Reddit(client_id=creds['client_id'],
                             client_secret=creds['client_secret'],
                             user_agent=creds['user_agent'],
@@ -61,21 +61,21 @@ class RedGifs:
         subreddits = str(creds["subreddits"]).split(",")
         GetRedditSub(subreddits)
         subreddits = str(clip.paste()).split("+")[:-1]
-        print(subreddits)
         for i in subreddits:
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
             # subreddit.submit(title, url=message, nsfw=True)
+            print(title, message)
             print(f"Successfully Posted in {i}")
 
     def getBestTag(tags: list):
         return tags[random.randint(0, len(tags))]
 
     def GetRedditTags():
-        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
-        os.chdir(path)
+        currentPath = RedGifs.RedgifsHome()
         with open("redgifs-secret.json", "r") as f:
             creds = json.load(f)
+        RedGifs.home(currentPath)
         subreddits = str(creds["gifSubReddit"]).split(",")
         return list(subreddits)
 
@@ -91,8 +91,10 @@ class RedGifs:
         isdiffrent = False
         giff = ""
         titlef = ""
+        currentPath = RedGifs.RedgifsHome()
         with open("Posted.txt", 'r') as f:
             data = f.readlines()
+        RedGifs.home(currentPath)
         while isdiffrent == False:
             randomNumber = random.randint(0, len(gif))
             randomGif = gif[randomNumber]
@@ -104,3 +106,12 @@ class RedGifs:
                 titlef = title[randomNumber]
                 isdiffrent = True
         return giff, titlef
+
+    def RedgifsHome():
+        currentPath = os.getcwd()
+        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
+        os.chdir(path)
+        return currentPath
+    
+    def home(currentPath: str):
+        os.chdir(currentPath)

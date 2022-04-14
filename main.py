@@ -23,9 +23,12 @@ def PostOnRedgifs():
         else:
             pg.alert("Program Exited")
             exit()
+        TitleOfThePost = tag
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
-        with open("Posted.txt", 'w') as f:
+        currentPath = Redgifs.RedGifs.RedgifsHome()
+        with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
+        Redgifs.RedGifs.home(currentPath)
     elif str(option).lower() == 'no':
         GetUserTag(Redgifs.RedGifs.getAllTags())
         tag = clip.paste()
@@ -47,8 +50,10 @@ def PostOnRedgifs():
         TitleOfThePost = pg.prompt(
             "Enter the Title of the Post", "Enter the Title of the Post")
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
-        with open("Posted.txt", 'w') as f:
+        currentPath = Redgifs.RedGifs.RedgifsHome()
+        with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
+        Redgifs.RedGifs.home(currentPath)
     elif str(option).lower() == 'from reddit??':
         subreddit = Redgifs.RedGifs.GetRedditTags()
         GetRedditTag(subreddit)
@@ -66,8 +71,10 @@ def PostOnRedgifs():
             want = wantToPlay
         TitleOfThePost = title
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
-        with open("Posted.txt", 'w') as f:
+        currentPath = Redgifs.RedGifs.RedgifsHome()
+        with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
+        Redgifs.RedGifs.home(currentPath)
     else:
         pg.alert(f"{config['Bot Name']} was exited Abnormally")
 
