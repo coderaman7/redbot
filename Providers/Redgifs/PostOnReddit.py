@@ -63,15 +63,27 @@ def PostOnReddit():
         want = 'Refresh'
         while want == "Refresh":
             videoURL, title = Redgifs.RedGifs.GetFromRedditGif(sub)
+            Source = str(videoURL).split("/")[2]
+            # print(Source)
+            # print(str(videoURL).split("/"))
             wantToPlay = pg.confirm(
-                f"Want to Play the Video with title {title}??", f'Want to Play the Video from Sub-Reddit {sub}', buttons=['Yes', 'No', "Refresh"])
+                f"Want to Play the Video with title {title}?? \n\nSource = {Source}", f'Want to Play the Video from Sub-Reddit {sub}', buttons=['Yes', 'No', "Refresh"])
             if str(wantToPlay).lower() == 'yes':
                 pg.alert(
                     "It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
             elif str(wantToPlay).lower() == 'no':
                 clip.copy("")
             want = wantToPlay
-        TitleOfThePost = title
+        CustomTitle = pg.confirm(
+            f"Want to Change the title : {title}", config["Bot Name"], buttons=["Yes", "NO"])
+        if str(CustomTitle).lower() == "yes":
+            CustomTitle = pg.prompt(
+                "Enter the Title You Want to Enter", config["Bot Name"], default=title)
+            TitleOfThePost = CustomTitle
+        elif str(CustomTitle).lower() == 'no':
+            TitleOfThePost = title
+        else:
+            exit()
         Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
         currentPath = Redgifs.RedGifs.RedgifsHome()
         with open("Posted.txt", 'a') as f:

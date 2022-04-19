@@ -5,6 +5,8 @@ import random
 import json
 import praw
 from GraphicalElements.OptionsMenu import GetRedditSub
+from praw.exceptions import RedditAPIException
+import pymsgbox as pg
 
 # Official Redgifs search link
 # https://api.redgifs.com/v2/gifs/search?search_text=anime
@@ -58,15 +60,24 @@ class RedGifs:
                             user_agent=creds['user_agent'],
                             redirect_uri=creds['redirect_uri'],
                             refresh_token=creds['refresh_token'])
-        subreddits = str(creds["subreddits"]).split(",")
+        subreddits = RedGifs.GetRedditTags()
         GetRedditSub(subreddits)
         subreddits = str(clip.paste()).split("+")[:-1]
         for i in subreddits:
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
-            subreddit.submit(title, url=message, nsfw=True)
+            with open("bannedSubreddits.txt", 'r') as f:
+                subreds = f.readlines()
+            if i not in subreds:
+                try:
+                    subreddit.submit(title, url=message, nsfw=True)
+                    print(f"Successfully Posted in {i}")
+                except RedditAPIException:
+                    with open("bannedSubreddits.txt", "a") as f:
+                        f.write(f"{i}\n")
+            else:
+                print(f"Skipped Sub Reddit {i} because it is BlackListed")
             # print(title, message)
-            print(f"Successfully Posted in {i}")
 
     def getBestTag(tags: list):
         return tags[random.randint(0, len(tags))]
@@ -76,8 +87,15 @@ class RedGifs:
         with open("redgifs-secret.json", "r") as f:
             creds = json.load(f)
         RedGifs.home(currentPath)
-        subreddits = str(creds["gifSubReddit"]).split(",")
-        return list(subreddits)
+        reddit = praw.Reddit(client_id=creds['client_id'],
+                             client_secret=creds['client_secret'],
+                             user_agent=creds['user_agent'],
+                             redirect_uri=creds['redirect_uri'],
+                             refresh_token=creds['refresh_token'])
+        my_subs = [
+            subreddit.display_name for subreddit in reddit.user.subreddits(limit=None)]
+        my_subs.sort()
+        return my_subs
 
     def GetFromRedditGif(subReddit: str):
         Data = requests.get(
@@ -86,8 +104,11 @@ class RedGifs:
         gif = []
         title = []
         for gifs in giflist:
-            title.append(gifs["data"]["title"])
-            gif.append(gifs["data"]["url_overridden_by_dest"])
+            try:
+                title.append(gifs["data"]["title"])
+                gif.append(gifs["data"]["url_overridden_by_dest"])
+            except KeyError:
+                pass
         isdiffrent = False
         giff = ""
         titlef = ""
@@ -95,8 +116,11 @@ class RedGifs:
         with open("Posted.txt", 'r') as f:
             data = f.readlines()
         RedGifs.home(currentPath)
+        if len(title) == 0:
+            pg.alert(f"Error! Not a single Media found in {subReddit}")
+            exit()
         while isdiffrent == False:
-            randomNumber = random.randint(0, len(gif))
+            randomNumber = random.randint(0, len(gif)-1)
             randomGif = gif[randomNumber]
             if randomGif in data:
                 isdiffrent = False

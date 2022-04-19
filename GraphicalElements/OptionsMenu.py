@@ -1,5 +1,6 @@
 # Import module
 from tkinter import *
+from tkinter.scrolledtext import ScrolledText
 import pyperclip as clip
 from tkinter import ttk
 
@@ -48,7 +49,7 @@ def GetUserTag(options: list):
 def GetRedditSub(options: list):
     root = Tk()
     root.config(width=500,height=len(options)*10)
-    root.geometry(f"500x{len(options)*30}")
+    root.geometry(f"500x500")
 
     optionCheckBox = {f"{options[0]}":IntVar()}
     for i in options:
@@ -69,9 +70,10 @@ def GetRedditSub(options: list):
     clicked.set("Select the Tag")
     drop = ttk.Combobox(root, textvariable=clicked, values=options)
     drop.pack()
+    text = ScrolledText(root, width=50, height=25)
+    text.pack()
     for key, value in optionCheckBox.items():
-        ctrl = Checkbutton(text=key, variable=value)
-        ctrl.pack()
+        text.window_create('end', window=Checkbutton(text=key, variable=value))
     button = Button(root, text="Next", command=show).pack()
     label = Label(root, text=" ")
     label.pack()
@@ -101,3 +103,6 @@ def GetRedditTag(options: list):
     label = Label(root, text=" ")
     label.pack()
     root.mainloop()
+
+
+# GetRedditSub(["Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello"])
