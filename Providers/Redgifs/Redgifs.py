@@ -68,7 +68,7 @@ class RedGifs:
             reddit.validate_on_submit = True
             with open("bannedSubreddits.txt", 'r') as f:
                 subreds = f.readlines()
-            if i not in subreds:
+            if f"{i}\n" not in subreds:
                 try:
                     subreddit.submit(title, url=message, nsfw=True)
                     print(f"Successfully Posted in {i}")
