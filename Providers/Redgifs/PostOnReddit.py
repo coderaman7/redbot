@@ -11,7 +11,7 @@ with open('config.json', 'r') as f:
 
 def PostOnReddit():
     option = pg.confirm(
-        f"Do you want {config['Bot Name']} to Upload on you Behalf??", f'Posting on Reddit : {config["Bot Name"]}', buttons=["Yes", "No", "From Reddit??"])
+        f"Do you want {config['Bot Name']} to Upload on you Behalf??", f'Posting on Reddit : {config["Bot Name"]}', buttons=["Yes", "No", "From Reddit??", "Post a Particular Link", "Crosspost This"])
     if str(option).lower() == 'yes':
         tag = Redgifs.RedGifs.getBestTag(Redgifs.RedGifs.getAllTags())
         videoURL = Redgifs.RedGifs.GetFromRedgifs(tag)
@@ -89,5 +89,17 @@ def PostOnReddit():
         with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
         Redgifs.RedGifs.home(currentPath)
+    elif str(option).lower() == "post a particular link":
+        videoURL = pg.prompt(
+            f"Enter the URL", config["Bot Name"])
+        TitleOfThePost = pg.prompt(
+            f"Enter the Title for this video", config["Bot Name"])
+        Redgifs.RedGifs.openAndPost(TitleOfThePost, videoURL)
+        currentPath = Redgifs.RedGifs.RedgifsHome()
+        with open("Posted.txt", 'a') as f:
+            f.write(f'{videoURL}\n')
+        Redgifs.RedGifs.home(currentPath)
+    elif str(option).lower() == "crosspost this":
+        pg.alert("This Feature is not yet enabled")
     else:
         pg.alert(f"{config['Bot Name']} was exited Abnormally")

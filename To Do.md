@@ -18,3 +18,8 @@
  - [ ] Easy to Get Started
 
  [Watch Later - link](https://www.redgifs.com/watch/noteworthystudiousirrawaddydolphin)
+
+ https://redgifs.com/watch/limpthistledwarfmongoose
+ https://redgifs.com/watch/legaldisguisedyellowbellylizard
+ https://redgifs.com/watch/unluckyspeedytsetsefly
+ https://redgifs.com/watch/goldclevergermanspitz
