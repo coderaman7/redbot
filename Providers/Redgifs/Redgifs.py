@@ -1,4 +1,7 @@
 import os
+import socket
+import sys
+import webbrowser
 import requests
 import pyperclip as clip
 import random
@@ -83,10 +86,34 @@ class RedGifs:
         return tags[random.randint(0, len(tags))]
 
     def GetRedditTags():
+        with open('config.json', 'r') as f:
+            config = json.load(f)
         currentPath = RedGifs.RedgifsHome()
-        with open("redgifs-secret.json", "r") as f:
-            creds = json.load(f)
-        RedGifs.home(currentPath)
+        try:
+            with open("redgifs-secret.json", "r") as f:
+                creds = json.load(f)
+        except FileNotFoundError:
+            clientID = pg.prompt("Enter the Client ID ( Which is just below the Bot Name on Reddit Dev Dashboard )", "Collecting Client ID")
+            if clientID == None:
+                exit()
+            clientSecret = pg.prompt("Enter the Client Secret",
+                                    "Collecting Client Secret")
+            if clientSecret == None:
+                exit()
+            refreshToken = RedGifs.main(clientID, clientSecret)
+            if refreshToken != 1:
+                dataSet = {
+                    "client_id": clientID,
+                    "client_secret": clientSecret,
+                    "user_agent": config["Bot Name"],
+                    "redirect_uri": "http://localhost:8080",
+                    "refresh_token": refreshToken
+                }
+                with open("redgifs-secret.json", 'w') as f:
+                    json.dump(dataSet, f, indent=4)
+        finally:
+            with open("redgifs-secret.json", "r") as f:
+                creds = json.load(f)
         reddit = praw.Reddit(client_id=creds['client_id'],
                              client_secret=creds['client_secret'],
                              user_agent=creds['user_agent'],
@@ -95,6 +122,7 @@ class RedGifs:
         my_subs = [
             subreddit.display_name for subreddit in reddit.user.subreddits(limit=None)]
         my_subs.sort()
+        RedGifs.home(currentPath)
         return my_subs
 
     def GetFromRedditGif(subReddit: str):
@@ -137,5 +165,82 @@ class RedGifs:
         os.chdir(path)
         return currentPath
     
+
+    def receive_connection():
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server.bind(("localhost", 8080))
+        server.listen(1)
+        client = server.accept()[0]
+        server.close()
+        return client
+
+
+    def send_message(client, message):
+        """Send message to client and close the connection."""
+        print(message)
+        client.send(f"HTTP/1.1 200 OK\r\n\r\n{message}".encode("utf-8"))
+        client.close()
+
+
+    def main(clientID, ClientSecret):
+        """Provide the program's entry point when directly executed."""
+        print(
+            "Go here while logged into the account you want to create a token for: "
+            "https://www.reddit.com/prefs/apps/"
+        )
+        print(
+            "Click the create an app button. Put something in the name field and select the"
+            " script radio button."
+        )
+        print("Put http://localhost:8080 in the redirect uri field and click create app")
+        client_id = clientID
+        client_secret = ClientSecret
+        # client_id = pg.prompt(
+        #     "Enter the client ID, it's the line just under Personal use script at the top: ",
+        #     "Enter the client ID, it's the line just under Personal use script at the top: "
+        # )
+        # client_secret = pg.prompt(
+        #     "Enter the client secret, it's the line next to secret: ",
+        #     "Enter the client secret, it's the line next to secret: ")
+        commaScopes = 'all'
+
+        if commaScopes.lower() == "all":
+            scopes = ["*"]
+        else:
+            scopes = commaScopes.strip().split(",")
+
+        reddit = praw.Reddit(
+            client_id=client_id.strip(),
+            client_secret=client_secret.strip(),
+            redirect_uri="http://localhost:8080",
+            user_agent="praw_refresh_token_example",
+        )
+        state = str(random.randint(0, 65000))
+        url = reddit.auth.url(scopes, state, "permanent")
+        webbrowser.open_new(url)
+        sys.stdout.flush()
+
+        client = RedGifs.receive_connection()
+        data = client.recv(1024).decode("utf-8")
+        param_tokens = data.split(" ", 2)[1].split("?", 1)[1].split("&")
+        params = {
+            key: value for (key, value) in [token.split("=") for token in param_tokens]
+        }
+
+        if state != params["state"]:
+            RedGifs.send_message(
+                client,
+                f"State mismatch. Expected: {state} Received: {params['state']}",
+            )
+            return 1
+        elif "error" in params:
+            RedGifs.send_message(client, params["error"])
+            return 1
+
+        refresh_token = reddit.auth.authorize(params["code"])
+        RedGifs.send_message(client, f"Refresh token: {refresh_token}")
+        return refresh_token
+
     def home(currentPath: str):
         os.chdir(currentPath)
