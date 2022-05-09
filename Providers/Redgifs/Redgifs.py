@@ -1,7 +1,4 @@
 import os
-import socket
-import sys
-import webbrowser
 import requests
 import pyperclip as clip
 import random
@@ -11,34 +8,68 @@ from GraphicalElements.OptionsMenu import GetRedditSub
 from praw.exceptions import RedditAPIException
 import pymsgbox as pg
 
+from Providers.Reddit import Reddit
+
 # Official Redgifs search link
 # https://api.redgifs.com/v2/gifs/search?search_text=anime
 
 class RedGifs:
 
+    # Get All the Tags of Redgifs 
     def getAllTags():
+
+        # old version of Redgifs API 
         olduri = "https://api.redgifs.com/v1/"
+
+        # get all the Redgifs Tags and select only tags 
         cateogary = requests.get(f'{olduri}tags').json()["tags"]
         gifContent = []
+
+        # filter all the tags who are used for over more than 5000 videos 
         for tag in cateogary:
             if int(tag["count"]) >= 5000:
                 gifContent.append(tag["name"])
+
+        # return all the tags sorted based on the alphabets 
         return sorted(gifContent)
 
+
+    # Get all the videos based on tags 
     def GetFromRedgifs(userQuery: str):
+
+        # new redgifs api 
         newuri = "https://api.redgifs.com/v2/"
+
+        # get the videos based on tags 
         Data = requests.get(
             f"{newuri}gifs/search?search_text={userQuery}&count=80&order=trending").json()
         gifs = Data['gifs']
         giff = []
+
+        # get all the videos of quality hd 
         for gif in gifs:
             giff.append(f'{gif["urls"]["hd"]}')
+
+        # if nothing returned from redgifs then alert and quit 
         if len(giff) <= 1:
             print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
+            exit()
+
+        
+        # Get all the links from the posted links 
         currentPath = RedGifs.RedgifsHome()
-        with open("Posted.txt", 'r') as f:
-            data = f.readlines()
+        try:
+            with open("Posted.txt", 'r') as f:
+                data = f.readlines()
+        except:
+            with open("Posted.txt", 'w') as f:
+                f.write("")
+        finally:
+            with open("Posted.txt", 'r') as f:
+                data = f.readlines()
         RedGifs.home(currentPath)
+
+        # Generate the links and copy to clipboard and return it
         isdiffrent = False
         gifff = ""
         while isdiffrent == False:
@@ -53,82 +84,142 @@ class RedGifs:
                 isdiffrent = True
         return gifff
 
-    def openAndPost(title: str, message: str):
+
+    # Module to Post on Reddit with or without crosspost 
+    def openAndPost(title, message, crossPost = False, toPromote = ""):
+
         currentPath = RedGifs.RedgifsHome()
-        with open("redgifs-secret.json", "r") as f:
-            creds = json.load(f)
+        try:
+            with open("reddit-secret.json", "r") as f:
+                creds = json.load(f)
+        except FileNotFoundError:
+            Reddit.Reddit.createRedditApp()
+        finally:
+            with open("reddit-secret.json", "r") as f:
+                creds = json.load(f)
         RedGifs.home(currentPath)
+
+        # Login to Reddit using api 
         reddit = praw.Reddit(client_id=creds['client_id'],
                             client_secret=creds['client_secret'],
                             user_agent=creds['user_agent'],
                             redirect_uri=creds['redirect_uri'],
                             refresh_token=creds['refresh_token'])
+
+        # getting all the subreddits from Reddit 
         subreddits = RedGifs.GetRedditTags()
+
+        # Get the Subreddits 
         GetRedditSub(subreddits)
         subreddits = str(clip.paste()).split("+")[:-1]
-        for i in subreddits:
-            subreddit = reddit.subreddit(i)
-            reddit.validate_on_submit = True
-            with open("bannedSubreddits.txt", 'r') as f:
-                subreds = f.readlines()
-            if f"{i}\n" not in subreds:
+        print(subreddits[0])
+        if crossPost == False:
+            for i in subreddits:
+                subreddit = reddit.subreddit(i)
+                reddit.validate_on_submit = True
                 try:
-                    subreddit.submit(title, url=message, nsfw=True)
-                    print(f"Successfully Posted in {i}")
-                except RedditAPIException:
-                    with open("bannedSubreddits.txt", "a") as f:
-                        f.write(f"{i}\n")
-            else:
-                print(f"Skipped Sub Reddit {i} because it is BlackListed")
-            # print(title, message)
+                    with open("bannedSubreddits.txt", 'r') as f:
+                        subreds = f.readlines()
+                except FileNotFoundError:
+                    with open("bannedSubreddits.txt", 'w') as f:
+                        f.write("")
+                finally:
+                    with open("bannedSubreddits.txt", 'r') as f:
+                        subreds = f.readlines()
+                if f"{i}\n" not in subreds:
+                    try:
+                        subreddit.submit(title, url=message, nsfw=True)
+                        print(f"Successfully Posted in {i}")
+                    except RedditAPIException:
+                        with open("bannedSubreddits.txt", "a") as f:
+                            f.write(f"{i}\n")
+                else:
+                    print(f"Skipped Sub Reddit {i} because it is BlackListed")
+                # print(title, message)
+        if crossPost == True:
+            subredditt = reddit.subreddit(toPromote)
+            submitID = subredditt.submit(title, url=message, nsfw=True)
+            submitionn = reddit.submission(submitID)
+            for i in subreddits:
+                try:
+                    with open("bannedfromCrossPostingSubreddits.txt", 'r') as f:
+                        subreds = f.readlines()
+                except FileNotFoundError:
+                    with open("bannedfromCrossPostingSubreddits.txt", 'w') as f:
+                        f.write("")
+                finally:
+                    with open("bannedfromCrossPostingSubreddits.txt", 'r') as f:
+                        subreds = f.readlines()
+                if f"{i}\n" not in subreds:
+                    try:
+                        cross_Post = submitionn.crosspost(
+                            i, nsfw=True, send_replies=False)
+                        print(f"Successfully Cross Posted in {i}")
+                    except RedditAPIException as e:
+                        # with open("bannedfromCrossPostingSubreddits.txt", "a") as f:
+                        #     f.write(f"{i}\n")
+                        try:
+                            with open("errors.txt", "r") as f:
+                                errors = f.readlines()
+                        except FileNotFoundError:
+                            with open("errors.txt", "w") as f:
+                                f.write("")
+                        finally:
+                            with open("errors.txt", "r") as f:
+                                errors = f.readlines()
+
+                        if f"{e.error_type}\n" not in errors:
+                            with open("errors.txt", "a") as f:
+                                f.write(f"{e.error_type}\n")
+                        else:
+                            pg.alert(e.error_type, "Unhandleled error")
+                            print(f"Skipped Sub Reddit {i} because it's error is not handled")
+                else:
+                    print(f"Skipped Sub Reddit {i} because it is BlackListed")
+            
 
     def getBestTag(tags: list):
-        return tags[random.randint(0, len(tags))]
+        return tags[random.randint(0, len(tags)-(len(tags)/2))]
 
+
+    # Get all the Subreddit's a user is in 
     def GetRedditTags():
-        with open('config.json', 'r') as f:
-            config = json.load(f)
+
+        # Try and open the reddit secret file and if not exist then create 
         currentPath = RedGifs.RedgifsHome()
         try:
-            with open("redgifs-secret.json", "r") as f:
+            with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
         except FileNotFoundError:
-            clientID = pg.prompt("Enter the Client ID ( Which is just below the Bot Name on Reddit Dev Dashboard )", "Collecting Client ID")
-            if clientID == None:
-                exit()
-            clientSecret = pg.prompt("Enter the Client Secret",
-                                    "Collecting Client Secret")
-            if clientSecret == None:
-                exit()
-            refreshToken = RedGifs.main(clientID, clientSecret)
-            if refreshToken != 1:
-                dataSet = {
-                    "client_id": clientID,
-                    "client_secret": clientSecret,
-                    "user_agent": config["Bot Name"],
-                    "redirect_uri": "http://localhost:8080",
-                    "refresh_token": refreshToken
-                }
-                with open("redgifs-secret.json", 'w') as f:
-                    json.dump(dataSet, f, indent=4)
+            Reddit.Reddit.createRedditApp()
         finally:
-            with open("redgifs-secret.json", "r") as f:
+            with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
+
+        # login to reddit 
         reddit = praw.Reddit(client_id=creds['client_id'],
                              client_secret=creds['client_secret'],
                              user_agent=creds['user_agent'],
                              redirect_uri=creds['redirect_uri'],
                              refresh_token=creds['refresh_token'])
+        
+        # get and sort all the subreddits and return the subreddit's
         my_subs = [
             subreddit.display_name for subreddit in reddit.user.subreddits(limit=None)]
         my_subs.sort()
         RedGifs.home(currentPath)
         return my_subs
 
+
+    # Get gifs and title from a subreddit
     def GetFromRedditGif(subReddit: str):
-        Data = requests.get(
-            f"https://www.reddit.com/r/{subReddit}/new/.json", headers={'User-agent': 'GetTheData'}).json()
-        giflist = Data['data']['children']
+
+        # get the json from a subreddit 
+        giflist = requests.get(
+            f"https://www.reddit.com/r/{subReddit}/new/.json", headers={'User-agent': 'GetTheData'}).json()['data']['children']
+        # giflist = Data['data']['children']
+
+        # store all the gifs and title in deffrent list and return a random gif and title 
         gif = []
         title = []
         for gifs in giflist:
@@ -140,13 +231,19 @@ class RedGifs:
         isdiffrent = False
         giff = ""
         titlef = ""
+
+        # keeping in mind that the generated link is not repeated 
         currentPath = RedGifs.RedgifsHome()
         with open("Posted.txt", 'r') as f:
             data = f.readlines()
         RedGifs.home(currentPath)
+
+        # If No Media found then exit 
         if len(title) == 0:
             pg.alert(f"Error! Not a single Media found in {subReddit}")
             exit()
+
+        # Else just select a random video from it and return it
         while isdiffrent == False:
             randomNumber = random.randint(0, len(gif)-1)
             randomGif = gif[randomNumber]
@@ -159,88 +256,20 @@ class RedGifs:
                 isdiffrent = True
         return giff, titlef
 
+    # change to the reddit secret api location 
     def RedgifsHome():
+        
+        # get the current location of the script 
         currentPath = os.getcwd()
-        path = os.path.join(os.getcwd(), "Providers", "Redgifs")
+
+        # Move to the dezired location 
+        path = os.path.join(os.getcwd(), "Providers", "Reddit")
         os.chdir(path)
+
+        # now return the current location 
         return currentPath
+
     
-
-    def receive_connection():
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind(("localhost", 8080))
-        server.listen(1)
-        client = server.accept()[0]
-        server.close()
-        return client
-
-
-    def send_message(client, message):
-        """Send message to client and close the connection."""
-        print(message)
-        client.send(f"HTTP/1.1 200 OK\r\n\r\n{message}".encode("utf-8"))
-        client.close()
-
-
-    def main(clientID, ClientSecret):
-        """Provide the program's entry point when directly executed."""
-        print(
-            "Go here while logged into the account you want to create a token for: "
-            "https://www.reddit.com/prefs/apps/"
-        )
-        print(
-            "Click the create an app button. Put something in the name field and select the"
-            " script radio button."
-        )
-        print("Put http://localhost:8080 in the redirect uri field and click create app")
-        client_id = clientID
-        client_secret = ClientSecret
-        # client_id = pg.prompt(
-        #     "Enter the client ID, it's the line just under Personal use script at the top: ",
-        #     "Enter the client ID, it's the line just under Personal use script at the top: "
-        # )
-        # client_secret = pg.prompt(
-        #     "Enter the client secret, it's the line next to secret: ",
-        #     "Enter the client secret, it's the line next to secret: ")
-        commaScopes = 'all'
-
-        if commaScopes.lower() == "all":
-            scopes = ["*"]
-        else:
-            scopes = commaScopes.strip().split(",")
-
-        reddit = praw.Reddit(
-            client_id=client_id.strip(),
-            client_secret=client_secret.strip(),
-            redirect_uri="http://localhost:8080",
-            user_agent="praw_refresh_token_example",
-        )
-        state = str(random.randint(0, 65000))
-        url = reddit.auth.url(scopes, state, "permanent")
-        webbrowser.open_new(url)
-        sys.stdout.flush()
-
-        client = RedGifs.receive_connection()
-        data = client.recv(1024).decode("utf-8")
-        param_tokens = data.split(" ", 2)[1].split("?", 1)[1].split("&")
-        params = {
-            key: value for (key, value) in [token.split("=") for token in param_tokens]
-        }
-
-        if state != params["state"]:
-            RedGifs.send_message(
-                client,
-                f"State mismatch. Expected: {state} Received: {params['state']}",
-            )
-            return 1
-        elif "error" in params:
-            RedGifs.send_message(client, params["error"])
-            return 1
-
-        refresh_token = reddit.auth.authorize(params["code"])
-        RedGifs.send_message(client, f"Refresh token: {refresh_token}")
-        return refresh_token
-
+    # Move back to the original location 
     def home(currentPath: str):
         os.chdir(currentPath)

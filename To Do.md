@@ -9,13 +9,13 @@
  - [x] Provide a Facility to approve as soon as it's uploaded on Reddit
  - [x] Preview on Reddit Mobile App as Uploaded
  - [ ] Support for Multiple Website's
- - [ ] Create a New Config File if not present
+ - [x] Create a New Config File if not present
  - [ ] Help to Create the Dev Accounts 
- - [ ] Customize the App
+ - [x] Customize the App
  - [ ] Update the Script without GIT
- - [ ] Write Documentation for this
- - [ ] Simplify the Code
- - [ ] Easy to Get Started
+ - [x] Write Documentation for this
+ - [x] Simplify the Code
+ - [x] Easy to Get Started
 
  [Watch Later - link](https://www.redgifs.com/watch/noteworthystudiousirrawaddydolphin)
 
