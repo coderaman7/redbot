@@ -1,5 +1,7 @@
 __pycache__
 *.json
 test.py
-test2.py
-*.txt
+bannedSubreddits.txt
+errors.txt
+temp.txt
+Posted.txt

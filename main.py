@@ -6,6 +6,8 @@ from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
 from Providers.Reddit.Reddit import Reddit
 from Providers.Redgifs.Redgifs import RedGifs
 
+BotVersion = "1.1.1"
+
 # To Do for this Bot
 # Discord Reddit Twitter YouTube Snapchat Instagram
 
@@ -18,7 +20,7 @@ except FileNotFoundError:
                         "BOT Name", f"{os.getlogin()}'s BOT")
     username = pg.prompt("What's your Reddit Username",
                         "Reddit username")
-    Version = "1.1"
+    Version = BotVersion
     dataToJSON = {"Bot Name": BotName, "Version": Version, "username": username}
     with open("config.json", "a") as f:
         json.dump(dataToJSON, f, indent=4)
