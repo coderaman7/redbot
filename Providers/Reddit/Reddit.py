@@ -20,7 +20,7 @@ class Reddit:
 
         # Open the Reddit api keys and read it 
         currentPath = RedGifs.RedgifsHome()
-        with open("redgifs-secret.json", "r") as f:
+        with open("reddit-secret.json", "r") as f:
             creds = json.load(f)
         RedGifs.home(currentPath)
 
@@ -48,7 +48,7 @@ class Reddit:
 
         # Open the Reddit api keys and read it
         currentPath = RedGifs.RedgifsHome()
-        with open("redgifs-secret.json", "r") as f:
+        with open("reddit-secret.json", "r") as f:
             creds = json.load(f)
         RedGifs.home(currentPath)
 
@@ -69,11 +69,8 @@ class Reddit:
 
 
     # Create the Reddit secret api file 
-    def createRedditApp():
 
-        # open the config file
-        with open('config.json', 'r') as f:
-            config = json.load(f)
+    def createRedditApp(config):
 
         # Get the Client ID if blank then exit
         clientID = pg.prompt(
@@ -99,7 +96,7 @@ class Reddit:
                 "redirect_uri": "http://localhost:8080",
                 "refresh_token": refreshToken
             }
-            with open("redgifs-secret.json", 'w') as f:
+            with open("reddit-secret.json", 'w') as f:
                 json.dump(dataSet, f, indent=4)
 
     
@@ -119,7 +116,7 @@ class Reddit:
         return client
 
     def send_message(client, message):
-        print(message)
+        # print(message)
         client.send(f"HTTP/1.1 200 OK\r\n\r\n{message}".encode("utf-8"))
         client.close()
 

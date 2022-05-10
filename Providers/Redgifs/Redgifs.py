@@ -37,6 +37,9 @@ class RedGifs:
     # Get all the videos based on tags 
     def GetFromRedgifs(userQuery: str):
 
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
         # new redgifs api 
         newuri = "https://api.redgifs.com/v2/"
 
@@ -52,7 +55,8 @@ class RedGifs:
 
         # if nothing returned from redgifs then alert and quit 
         if len(giff) <= 1:
-            print("Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit")
+            pg.alert(
+                "Please Try to Run the Program Again as this tym the API returned nothing to post on Reddit", config["Bot Name"])
             exit()
 
         
@@ -88,12 +92,16 @@ class RedGifs:
     # Module to Post on Reddit with or without crosspost 
     def openAndPost(title, message, crossPost = False, toPromote = ""):
 
+        # open the config file
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
         currentPath = RedGifs.RedgifsHome()
         try:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
         except FileNotFoundError:
-            Reddit.Reddit.createRedditApp()
+            Reddit.Reddit.createRedditApp(config)
         finally:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
@@ -112,7 +120,6 @@ class RedGifs:
         # Get the Subreddits 
         GetRedditSub(subreddits)
         subreddits = str(clip.paste()).split("+")[:-1]
-        print(subreddits[0])
         if crossPost == False:
             for i in subreddits:
                 subreddit = reddit.subreddit(i)
@@ -142,13 +149,13 @@ class RedGifs:
             submitionn = reddit.submission(submitID)
             for i in subreddits:
                 try:
-                    with open("bannedfromCrossPostingSubreddits.txt", 'r') as f:
+                    with open("noCrossPosting.txt", 'r') as f:
                         subreds = f.readlines()
                 except FileNotFoundError:
-                    with open("bannedfromCrossPostingSubreddits.txt", 'w') as f:
+                    with open("noCrossPosting.txt", 'w') as f:
                         f.write("")
                 finally:
-                    with open("bannedfromCrossPostingSubreddits.txt", 'r') as f:
+                    with open("noCrossPosting.txt", 'r') as f:
                         subreds = f.readlines()
                 if f"{i}\n" not in subreds:
                     try:
@@ -156,8 +163,8 @@ class RedGifs:
                             i, nsfw=True, send_replies=False)
                         print(f"Successfully Cross Posted in {i}")
                     except RedditAPIException as e:
-                        # with open("bannedfromCrossPostingSubreddits.txt", "a") as f:
-                        #     f.write(f"{i}\n")
+                        with open("noCrossPosting.txt", "a") as f:
+                            f.write(f"{i}\n")
                         try:
                             with open("errors.txt", "r") as f:
                                 errors = f.readlines()
@@ -185,13 +192,17 @@ class RedGifs:
     # Get all the Subreddit's a user is in 
     def GetRedditTags():
 
+        # open the config file
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
         # Try and open the reddit secret file and if not exist then create 
         currentPath = RedGifs.RedgifsHome()
         try:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
         except FileNotFoundError:
-            Reddit.Reddit.createRedditApp()
+            Reddit.Reddit.createRedditApp(config)
         finally:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
