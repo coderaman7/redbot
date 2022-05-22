@@ -245,8 +245,15 @@ class RedGifs:
 
         # keeping in mind that the generated link is not repeated 
         currentPath = RedGifs.RedgifsHome()
-        with open("Posted.txt", 'r') as f:
-            data = f.readlines()
+        try:
+            with open("Posted.txt", 'r') as f:
+                data = f.readlines()
+        except:
+            with open("Posted.txt", 'w') as f:
+                f.write("")
+        finally:
+            with open("Posted.txt", 'r') as f:
+                data = f.readlines()
         RedGifs.home(currentPath)
 
         # If No Media found then exit 
