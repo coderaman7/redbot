@@ -3,6 +3,7 @@ import pymsgbox as pg
 import os
 import pyperclip as clip
 from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
+from GraphicalElements.PostBox import PostBox
 from Providers.Reddit.Reddit import Reddit
 from Providers.Redgifs.Redgifs import RedGifs
 
@@ -87,7 +88,7 @@ elif option == "Delete Post/Comments Based on Karma":
 
 elif option == "Post by Own":
     secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=[
-                              "Mine Video", "From Reddit", "Post a Particular Link"])
+                              "Mine Video", "From Reddit", "Post a Particular Link", "Post Images"])
 
     # If the User want to Customize each and every part of upload and mine the best video
     if secondOption == "Mine Video":
@@ -216,6 +217,40 @@ elif option == "Post by Own":
         # Post to Reddit
         RedGifs.openAndPost(TitleOfThePost, videoURL,
                             crossPost=crossPost, toPromote=subredditToPromote)
+
+        # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit
+        currentPath = RedGifs.RedgifsHome()
+        with open("Posted.txt", 'a') as f:
+            f.write(f'{videoURL}\n')
+        RedGifs.home(currentPath)
+
+    # If User Wants to Post a Particular Link to Reddit
+    elif secondOption == "Post Images":
+
+        PostBox("Upload Images")
+        TitleOfThePost, videoURL = str(clip.paste()).split("+")
+        videoURL = videoURL.replace("(", "").replace(")", "").replace(" ", "")
+        videoURL = videoURL.replace("'", "").split(",")
+        images = []
+        num = 0
+        for i in videoURL:
+            num += 1
+            imageDict = {}
+            imageDict["image_path"] = i
+            images.append(imageDict)
+
+        subredditToPromote = ""
+        crossPost = False
+        promotion = pg.confirm(
+            "Do you want to Promote a Subreddit??", "Promotion", buttons=['Yes', 'No'])
+        if promotion == 'Yes':
+            GetUserTag(options=RedGifs.GetRedditTags(),
+                       title="Select the Subreddit to Promote")
+            subredditToPromote = clip.paste()
+            crossPost = True
+
+        # Post to Reddit
+        RedGifs.UploadImages(False, images, TitleOfThePost, subredditToPromote)
 
         # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit
         currentPath = RedGifs.RedgifsHome()
