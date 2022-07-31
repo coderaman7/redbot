@@ -1,9 +1,13 @@
+from bs4 import BeautifulSoup
 import os
+import re
+from ssl import VerifyFlags
 import requests
 import pyperclip as clip
 import random
 import json
 import praw
+import urllib.request
 from GraphicalElements.OptionsMenu import GetRedditSub
 from praw.exceptions import RedditAPIException
 import pymsgbox as pg
@@ -399,3 +403,9 @@ class RedGifs:
                                 f"Skipped Sub Reddit {i} because it's error is not handled")
                 else:
                     print(f"Skipped Sub Reddit {i} because it is BlackListed")
+
+#     def getRedGifsVideos(self):
+#         print(requests.get('https://api.redgifs.com/v1/me/collections'))
+
+# RedGifs.getRedGifsVideos("")
+# dataUrl = "https://www.redgifs.com/users/shawmir/collections/3c13a0673f"
