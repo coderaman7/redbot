@@ -181,8 +181,26 @@ class RedGifs:
                             with open("errors.txt", "a") as f:
                                 f.write(f"{e.error_type}\n")
                         else:
-                            pg.alert(e.error_type, "Unhandleled error")
-                            print(f"Skipped Sub Reddit {i} because it's error is not handled")
+                            subreddit = reddit.subreddit(i)
+                            reddit.validate_on_submit = True
+                            try:
+                                with open("bannedSubreddits.txt", 'r') as f:
+                                    subreds = f.readlines()
+                            except FileNotFoundError:
+                                with open("bannedSubreddits.txt", 'w') as f:
+                                    f.write("")
+                            finally:
+                                with open("bannedSubreddits.txt", 'r') as f:
+                                    subreds = f.readlines()
+                            if f"{i}\n" not in subreds:
+                                try:
+                                    subreddit.submit(title, url=message, nsfw=True)
+                                    print(f"Successfully Posted in {i}")
+                                except RedditAPIException:
+                                    with open("bannedSubreddits.txt", "a") as f:
+                                        f.write(f"{i}\n")
+                            else:
+                                print(f"Skipped Sub Reddit {i} because it is BlackListed")
                 else:
                     print(f"Skipped Sub Reddit {i} because it is BlackListed")
             
@@ -204,8 +222,8 @@ class RedGifs:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
         except FileNotFoundError:
-            # Reddit.Reddit.createRedditApp(config)
-            pass
+            Reddit.Reddit.createRedditApp(config)
+            # pass
         finally:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
@@ -409,7 +427,6 @@ class RedGifs:
                             with open("errors.txt", "a") as f:
                                 f.write(f"{e.error_type}\n")
                         else:
-                            pg.alert(e.error_type, "Unhandleled error")
                             print(
                                 f"Skipped Sub Reddit {i} because it's error is not handled")
                 else:
