@@ -1,16 +1,14 @@
-from bs4 import BeautifulSoup
 import os
-import re
-from ssl import VerifyFlags
 import requests
 import pyperclip as clip
 import random
 import json
 import praw
-import urllib.request
 from GraphicalElements.OptionsMenu import GetRedditSub
 from praw.exceptions import RedditAPIException
 import pymsgbox as pg
+
+from GraphicalElements.OptionsMenu import GetRedditTag
 
 from Providers.Reddit import Reddit
 
@@ -206,7 +204,8 @@ class RedGifs:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
         except FileNotFoundError:
-            Reddit.Reddit.createRedditApp(config)
+            # Reddit.Reddit.createRedditApp(config)
+            pass
         finally:
             with open("reddit-secret.json", "r") as f:
                 creds = json.load(f)
@@ -222,7 +221,7 @@ class RedGifs:
         my_subs = [
             subreddit.display_name for subreddit in reddit.user.subreddits(limit=None)]
         my_subs.sort()
-        finalSubreddits = []
+        finalSubreddits, finalSubreds = [], []
         RedGifs.home(currentPath)
         try:
             with open("bannedSubreddits.txt", 'r') as f:
@@ -233,10 +232,22 @@ class RedGifs:
         finally:
             with open("bannedSubreddits.txt", 'r') as f:
                 subreds = f.readlines()
+        try:
+            with open("noCrossPosting.txt", 'r') as f:
+                subreds = f.readlines()
+        except FileNotFoundError:
+            with open("noCrossPosting.txt", 'w') as f:
+                f.write("")
+        finally:
+            with open("noCrossPosting.txt", 'r') as f:
+                noCrosPost = f.readlines()
         for i in my_subs:
             if f'{i}\n' not in subreds:
                 finalSubreddits.append(i)
-        return finalSubreddits
+        for i in finalSubreddits:
+            if f'{i}\n' not in noCrosPost:
+                finalSubreds.append(i)
+        return finalSubreds
 
 
     # Get gifs and title from a subreddit
@@ -409,3 +420,4 @@ class RedGifs:
 
 # RedGifs.getRedGifsVideos("")
 # dataUrl = "https://www.redgifs.com/users/shawmir/collections/3c13a0673f"
+RedGifs.GetRedditTags()
