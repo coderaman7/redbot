@@ -99,13 +99,7 @@ class Reddit:
             with open("reddit-secret.json", 'w') as f:
                 json.dump(dataSet, f, indent=4)
 
-    
-    
-    
-    
-    
-    
-    
+    # To Receive connection from the Reddit website itself while generating a refresh token 
     def receive_connection():
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -115,11 +109,12 @@ class Reddit:
         server.close()
         return client
 
+    # When generated the close the connection and send a 200 OK message 
     def send_message(client, message):
-        # print(message)
         client.send(f"HTTP/1.1 200 OK\r\n\r\n{message}".encode("utf-8"))
         client.close()
 
+    # Start of the refresh token generation with all access to the Reddit Account 
     def main(clientID, ClientSecret):
         client_id = clientID
         client_secret = ClientSecret

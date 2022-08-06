@@ -274,11 +274,9 @@ class RedGifs:
         # get the json from a subreddit 
         giflist = requests.get(
             f"https://www.reddit.com/r/{subReddit}/new/.json", headers={'User-agent': 'GetTheData'}).json()['data']['children']
-        # giflist = Data['data']['children']
 
         # store all the gifs and title in deffrent list and return a random gif and title 
-        gif = []
-        title = []
+        gif, title = [], []
         for gifs in giflist:
             try:
                 title.append(gifs["data"]["title"])
@@ -286,8 +284,7 @@ class RedGifs:
             except KeyError:
                 pass
         isdiffrent = False
-        giff = ""
-        titlef = ""
+        giff, titlef = "", ""
 
         # keeping in mind that the generated link is not repeated 
         currentPath = RedGifs.RedgifsHome()

@@ -7,7 +7,7 @@ from GraphicalElements.PostBox import PostBox
 from Providers.Reddit.Reddit import Reddit
 from Providers.Redgifs.Redgifs import RedGifs
 
-BotVersion = "1.1.3"
+BotVersion = "1.2.3"
 
 # To Do for this Bot
 # Discord Reddit Twitter YouTube Snapchat Instagram
