@@ -1,54 +1,209 @@
-# Reddit Automator
+<a name="readme-top"></a>
 
-A Reddit Automator which grabs gifs from gifs websites
-  * Imagur
-  * RedGifs
-  * Gifycat
-  * Reddit
+<!-- PROJECT SHIELDS -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
 
-and posts on Reddit to gain Krama and buildup community so to user can focus on Content not on postining the same content on diffrent subreddit.
 
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/coderaman07/redbot">
+    <img src="assets/logo.png" alt="Logo" width="250" height="80">
+  </a>
+
+<h3 align="center">RedBot</h3>
+
+  <p align="center">
+    A Cross Platform Desktop Application which enables a Reddit user to automate NSFW gifs posting from Redgifs directly from Desktop wihtout opening redgifs or reddit on multiple Sub Reddits and also it enables a user to promote a particular Sub Reddits.
+    <br />
+    <a href="https://github.com/coderaman07/redbot"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/coderaman07/redbot">View Demo</a>
+    ·
+    <a href="https://github.com/coderaman07/redbot/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/coderaman07/redbot/issues">Request Feature</a>
+  </p>
+</div>
+
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+[![Product Name Screen Shot][product-screenshot]](https://github.com/coderaman07/redbot)
+[![Product Name Screen Shot][product-screenshot2]](https://github.com/coderaman07/redbot)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Built With
+
+* [![Python][Python]][Python-url]
+* [![Tkinter][Tkinter]][Tkinter-url]
+* [![PRAW][PRAW]][PRAW-url]
+* [![JSON][JSON]][JSON-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- GETTING STARTED -->
 ## Getting Started
 
-First a User have to get API Keys generated from Reddit Apps webpage and obtain the Client ID and Client Secret.
+This is an example of how you may give instructions on setting up your project locally.
+To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-A Reddit Account ( Brand New so that if the account get's shadow ban then your main account don't get affected )
+This is an example of how to list things you need to use the software and how to install them.
+* python3
+* pip
 
-### Installing
+### Installation
 
-1. If You don't want this to affect this your machine's Python ENV
-    * create a virtualenv by using ```pip install virtualenv``` then ```virtualenv virtualenv```
-    * If you're on **Windows**:
-      * activate the VirtualEnv
-       * hit command ```pip install -r requirements.txt```
-       * Open ```main.bat```
-    * If you're on **Linux/Mac**:
-       * activate the VirtualEnv
-       * hit command ```pip install -r requirements.txt```
+1. Get your Reddit API Key at [https://www.reddit.com/prefs/apps/](https://www.reddit.com/prefs/apps/)
+2. Clone the repo
+   ```sh
+   git clone https://github.com/coderaman07/redbot.git
+   ```
+3. Install NPM packages
+   ```sh
+   pip install -r requirements.txt
+   ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-2. If You want this to install in your machine's Python ENV
-    * If you're on **Windows**:
-      * hit command ```pip install -r requirements.txt```
-      * Open ```main.bat```
-   * If you're on **Linux/Mac**:
-     * hit command ```pip install -r requirements.txt```
 
-## Built With
 
-* PRAW
-* Tkinter
-* Requests
+<!-- USAGE EXAMPLES -->
+## Usage
 
+This project is used to automate Reddit and Redgifs so that you can grow up your personal NSFW Subreddit without even creating your NSFW content as sharing Redgifs VODs to Reddit is a general practice which is not termed as illegal ( unless you're taking the copyrights of the VODs you're sharing and generating somekind of income by selling someone else VODs ).
+
+<!-- _For more examples, please refer to the [Documentation](https://example.com)_ -->
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ROADMAP -->
+## Roadmap
+
+- [x] Get a Random NSFW Gifs from Redgifs ( Termed in this as Automate )
+- [x] Mine a Video/VOD
+  - [x] Get a Particular Gif from Redgifs based on cateogary
+  - [x] Get a Particular Gif/Photo from a selected Subreddit
+  - [x] Post a Particular URL
+  - [x] Post Multiple Images on Reddit without even opening a single browser
+- [x] Delete your Post or Comments based on a set amount of Likes/Karma
+    - [x] This set amount can be changable
+
+See the [open issues](https://github.com/coderaman07/redbot/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTRIBUTING -->
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-## Authors
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
 
-* **Aman Ojha** - *Initial work* - [Aman Ojha](https://github.com/coderaman07)
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- LICENSE -->
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details
+Distributed under the MIT License. See `LICENSE` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+Name - Aman
+Twitter - [@BugsOverflow](https://twitter.com/BugsOverflow)  
+Email - bugsoverflow@gmail.com  
+Website Connect - https://codeitdown.ml/contact
+
+Project Link: [https://github.com/coderaman07/redbot](https://github.com/coderaman07/redbot)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/coderaman07/redbot.svg?style=for-the-badge
+[contributors-url]: https://github.com/coderaman07/redbot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/coderaman07/redbot.svg?style=for-the-badge
+[forks-url]: https://github.com/coderaman07/redbot/network/members
+[stars-shield]: https://img.shields.io/github/stars/coderaman07/redbot.svg?style=for-the-badge
+[stars-url]: https://github.com/coderaman07/redbot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/coderaman07/redbot.svg?style=for-the-badge
+[issues-url]: https://github.com/coderaman07/redbot/issues
+[license-shield]: https://img.shields.io/github/license/coderaman07/redbot.svg?style=for-the-badge
+[license-url]: https://github.com/coderaman07/redbot/blob/master/LICENSE
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/coderaman07
+
+
+[product-screenshot]: assets/screen.png
+[product-screenshot2]: assets/screen1.png
+
+
+[Python]: https://img.shields.io/badge/python-000000?style=for-the-badge&logo=python&logoColor=white
+[Python-url]: https://python.org/
+[Tkinter]: https://img.shields.io/badge/Tkinter-20232A?style=for-the-badge&logo=tkinter&logoColor=61DAFB
+[Tkinter-url]: https://docs.python.org/3/library/tkinter.html
+[PRAW]: https://img.shields.io/badge/PRAW-35495E?style=for-the-badge&logo=praw&logoColor=4FC08D
+[PRAW-url]: https://praw.readthedocs.io/en/stable/
+[JSON]: https://img.shields.io/badge/JSON-DD0031?style=for-the-badge&logo=json&logoColor=white
+[JSON-url]: https://www.w3schools.com/js/js_json_intro.asp
