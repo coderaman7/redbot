@@ -7,6 +7,7 @@ import praw
 from GraphicalElements.OptionsMenu import GetRedditSub
 from praw.exceptions import RedditAPIException
 import pymsgbox as pg
+import pafy
 
 from GraphicalElements.OptionsMenu import GetRedditTag
 
@@ -85,10 +86,10 @@ class RedGifs:
             if link in data:
                 isdiffrent = False
             else:
-                clip.copy(link)
                 gifff = link
                 isdiffrent = True
-        return gifff
+
+        return gifff, linkGen
 
 
     # Module to Post on Reddit with or without crosspost 
@@ -203,6 +204,173 @@ class RedGifs:
                                 print(f"Skipped Sub Reddit {i} because it is BlackListed")
                 else:
                     print(f"Skipped Sub Reddit {i} because it is BlackListed")
+    # Module to Post on Reddit with or without crosspost 
+    def openAndPost(title, message, crossPost = False, toPromote = ""):
+
+        # open the config file
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
+        currentPath = RedGifs.RedgifsHome()
+        try:
+            with open("reddit-secret.json", "r") as f:
+                creds = json.load(f)
+        except FileNotFoundError:
+            Reddit.Reddit.createRedditApp(config)
+        finally:
+            with open("reddit-secret.json", "r") as f:
+                creds = json.load(f)
+        RedGifs.home(currentPath)
+
+        # Login to Reddit using api 
+        reddit = praw.Reddit(client_id=creds['client_id'],
+                            client_secret=creds['client_secret'],
+                            user_agent=creds['user_agent'],
+                            redirect_uri=creds['redirect_uri'],
+                            refresh_token=creds['refresh_token'])
+
+        # getting all the subreddits from Reddit 
+        subreddits = RedGifs.GetRedditTags()
+
+        # Get the Subreddits 
+        GetRedditSub(subreddits)
+        subreddits = str(clip.paste()).split("+")[:-1]
+        if crossPost == False:
+            for i in subreddits:
+                subreddit = reddit.subreddit(i)
+                reddit.validate_on_submit = True
+                try:
+                    with open("bannedSubreddits.txt", 'r') as f:
+                        subreds = f.readlines()
+                except FileNotFoundError:
+                    with open("bannedSubreddits.txt", 'w') as f:
+                        f.write("")
+                finally:
+                    with open("bannedSubreddits.txt", 'r') as f:
+                        subreds = f.readlines()
+                if f"{i}\n" not in subreds:
+                    try:
+                        subreddit.submit(title, url=message, nsfw=True)
+                        print(f"Successfully Posted in {i}")
+                    except RedditAPIException:
+                        with open("bannedSubreddits.txt", "a") as f:
+                            f.write(f"{i}\n")
+                else:
+                    print(f"Skipped Sub Reddit {i} because it is BlackListed")
+                # print(title, message)
+        if crossPost == True:
+            subredditt = reddit.subreddit(toPromote)
+            submitID = subredditt.submit(title, url=message, nsfw=True)
+            submitionn = reddit.submission(submitID)
+            for i in subreddits:
+                try:
+                    with open("noCrossPosting.txt", 'r') as f:
+                        subreds = f.readlines()
+                except FileNotFoundError:
+                    with open("noCrossPosting.txt", 'w') as f:
+                        f.write("")
+                finally:
+                    with open("noCrossPosting.txt", 'r') as f:
+                        subreds = f.readlines()
+                if f"{i}\n" not in subreds:
+                    try:
+                        cross_Post = submitionn.crosspost(
+                            i, nsfw=True, send_replies=False)
+                        print(f"Successfully Cross Posted in {i}")
+                    except RedditAPIException as e:
+                        with open("noCrossPosting.txt", "a") as f:
+                            f.write(f"{i}\n")
+                        try:
+                            with open("errors.txt", "r") as f:
+                                errors = f.readlines()
+                        except FileNotFoundError:
+                            with open("errors.txt", "w") as f:
+                                f.write("")
+                        finally:
+                            with open("errors.txt", "r") as f:
+                                errors = f.readlines()
+
+                        if f"{e.error_type}\n" not in errors:
+                            with open("errors.txt", "a") as f:
+                                f.write(f"{e.error_type}\n")
+                        else:
+                            subreddit = reddit.subreddit(i)
+                            reddit.validate_on_submit = True
+                            try:
+                                with open("bannedSubreddits.txt", 'r') as f:
+                                    subreds = f.readlines()
+                            except FileNotFoundError:
+                                with open("bannedSubreddits.txt", 'w') as f:
+                                    f.write("")
+                            finally:
+                                with open("bannedSubreddits.txt", 'r') as f:
+                                    subreds = f.readlines()
+                            if f"{i}\n" not in subreds:
+                                try:
+                                    subreddit.submit(title, url=message, nsfw=True)
+                                    print(f"Successfully Posted in {i}")
+                                except RedditAPIException:
+                                    with open("bannedSubreddits.txt", "a") as f:
+                                        f.write(f"{i}\n")
+                            else:
+                                print(f"Skipped Sub Reddit {i} because it is BlackListed")
+                else:
+                    print(f"Skipped Sub Reddit {i} because it is BlackListed")
+
+
+    # Module to Post on Reddit with or without crosspost 
+    def openAndPostText(title, message):
+
+        # open the config file
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
+        currentPath = RedGifs.RedgifsHome()
+        try:
+            with open("reddit-secret.json", "r") as f:
+                creds = json.load(f)
+        except FileNotFoundError:
+            Reddit.Reddit.createRedditApp(config)
+        finally:
+            with open("reddit-secret.json", "r") as f:
+                creds = json.load(f)
+        RedGifs.home(currentPath)
+
+        # Login to Reddit using api 
+        reddit = praw.Reddit(client_id=creds['client_id'],
+                            client_secret=creds['client_secret'],
+                            user_agent=creds['user_agent'],
+                            redirect_uri=creds['redirect_uri'],
+                            refresh_token=creds['refresh_token'])
+
+        # getting all the subreddits from Reddit 
+        subreddits = RedGifs.GetRedditTags()
+
+        # Get the Subreddits 
+        GetRedditSub(subreddits)
+        subreddits = str(clip.paste()).split("+")[:-1]
+        for i in subreddits:
+            subreddit = reddit.subreddit(i)
+            reddit.validate_on_submit = True
+            try:
+                with open("bannedSubreddits.txt", 'r') as f:
+                    subreds = f.readlines()
+            except FileNotFoundError:
+                with open("bannedSubreddits.txt", 'w') as f:
+                    f.write("")
+            finally:
+                with open("bannedSubreddits.txt", 'r') as f:
+                    subreds = f.readlines()
+            if f"{i}\n" not in subreds:
+                try:
+                    subreddit.submit(title, selftext=message, nsfw=True)
+                    print(f"Successfully Posted in {i}")
+                except RedditAPIException:
+                    with open("bannedSubreddits.txt", "a") as f:
+                        f.write(f"{i}\n")
+            else:
+                print(f"Skipped Sub Reddit {i} because it is BlackListed")
+            # print(title, message)
             
 
     def getBestTag(tags: list):
@@ -308,6 +476,11 @@ class RedGifs:
         while isdiffrent == False:
             randomNumber = random.randint(0, len(gif)-1)
             randomGif = gif[randomNumber]
+            try:
+                VideoURL = str(giflist[randomNumber]["data"]["media"]["oembed"]["thumbnail_url"]).replace(
+                    "-mobile.jpg", ".mp4")
+            except:
+                VideoURL = ""
             if randomGif in data:
                 isdiffrent = False
             else:
@@ -315,7 +488,7 @@ class RedGifs:
                 giff = randomGif
                 titlef = title[randomNumber]
                 isdiffrent = True
-        return giff, titlef
+        return giff, titlef, VideoURL
 
     # change to the reddit secret api location 
     def RedgifsHome():
@@ -434,4 +607,4 @@ class RedGifs:
 
 # RedGifs.getRedGifsVideos("")
 # dataUrl = "https://www.redgifs.com/users/shawmir/collections/3c13a0673f"
-RedGifs.GetRedditTags()
+# RedGifs.GetRedditTags()

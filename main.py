@@ -1,4 +1,5 @@
 import json
+import time
 import pymsgbox as pg
 import os
 import pyperclip as clip
@@ -6,6 +7,10 @@ from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
 from GraphicalElements.PostBox import PostBox
 from Providers.Reddit.Reddit import Reddit
 from Providers.Redgifs.Redgifs import RedGifs
+import vlc, pafy
+
+from Providers.YouTube.main import parseVideo
+from components.videoPlayer import PlayVideo
 
 BotVersion = "1.2.3"
 
@@ -36,18 +41,22 @@ option = pg.confirm(f"Reddit NSFW Automator", f'Posting on Reddit : {config["Bot
 
 # If User wants to automate each and every process 
 if str(option) == 'Automate':
-    tag = RedGifs.getBestTag(RedGifs.getAllTags())
-    videoURL = RedGifs.GetFromRedgifs(tag)
+    want = "Yes"
+    while want == "Yes":
+        tag = RedGifs.getBestTag(RedGifs.getAllTags())
+        videoURL, VidSource = RedGifs.GetFromRedgifs(tag)
 
-    # Alert if User wants to see the vide ( which can't be changed )
-    wantToPlay = pg.confirm("Want to Play the Video??", f'Want to Play the Video Under Cateogary of {tag}', buttons=['Yes', 'No'])
-    if str(wantToPlay).lower() == 'yes':
-        pg.alert("It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
-    elif str(wantToPlay).lower() == 'no':
-        clip.copy("")
-    else:
-        pg.alert("Program Exited")
-        exit()
+        # Alert if User wants to see the vide ( which can't be changed )
+        wantToPlay = pg.confirm("Want to Play the Video??",
+                                f'Want to Play the Video Under Cateogary of {tag}', buttons=['Yes', 'No'])
+        if str(wantToPlay).lower() == 'yes':
+            PlayVideo(VidSource)
+        elif str(wantToPlay).lower() == 'no':
+            clip.copy("")
+        else:
+            pg.alert("Program Exited")
+            exit()
+        want = pg.confirm("Do you want to change the Video??", "Confirmation", buttons=["Yes", "No"])
 
     # Title of the Post will be the Tag itself 
     TitleOfThePost = tag
@@ -72,8 +81,7 @@ elif option == "Delete Post/Comments Based on Karma":
     if secondOption == "Comments":
         karma = pg.prompt("Enter the Karma level to be maintained on Comments", "Delete Comments based on Karma") 
         try:
-            integerKarma = int(karma)
-            Reddit.DeleteCommentsBelowKarma(integerKarma)
+            Reddit.DeleteCommentsBelowKarma(int(karma))
         except:
             pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
 
@@ -81,14 +89,13 @@ elif option == "Delete Post/Comments Based on Karma":
     elif secondOption == "Posts":
         karma = pg.prompt("Enter the Karma level to be maintained on Posts", "Delete Posts based on Karma")
         try:
-            integerKarma = int(karma)
-            Reddit.DeletePostsBelowKarma(integerKarma)
+            Reddit.DeletePostsBelowKarma(int(karma))
         except:
             pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
 
 elif option == "Post by Own":
     secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=[
-                              "Mine Video", "From Reddit", "Post a Particular Link", "Post Images"])
+                              "Mine Video", "From Reddit", "Post a Particular Link", "Post Images", "Post Text"])
 
     # If the User want to Customize each and every part of upload and mine the best video
     if secondOption == "Mine Video":
@@ -100,12 +107,11 @@ elif option == "Post by Own":
 
         # while loop so that we can refresh the video urls and the user can get option to change video urls which is to be uploaded
         while want == "Refresh":
-            videoURL = RedGifs.GetFromRedgifs(tag)
+            videoURL, VidSource = RedGifs.GetFromRedgifs(tag)
             wantToPlay = pg.confirm("Want to Play the Video??", f'Want to Play the Video Under Cateogary of {tag}', buttons=[
                                     'Yes', 'No', "Refresh"])
             if str(wantToPlay).lower() == 'yes':
-                pg.alert(
-                    "It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
+                PlayVideo(VidSource)
             elif str(wantToPlay).lower() == 'no':
                 clip.copy("")
             elif str(wantToPlay).lower() == 'refresh':
@@ -149,15 +155,16 @@ elif option == "Post by Own":
         while want == "Refresh":
 
             # Get Video Url and title and then strip it to make it a better video with SEO 
-            videoURL, title = RedGifs.GetFromRedditGif(sub)
+            videoURL, title, gifSource = RedGifs.GetFromRedditGif(sub)
             Source = str(videoURL).split("/")[2]
 
             # If a user wants to play the video then copy the url to clipboard else clear clipboard 
             wantToPlay = pg.confirm(f"Want to Play the Video with title {title}?? \n\nSource = {Source}",
                                     f'Want to Play the Video from Sub-Reddit {sub}', buttons=['Yes', 'No', "Refresh"])
             if str(wantToPlay).lower() == 'yes':
-                pg.alert(
-                    "It's been already Copied to your Clipboard. Just Open any private Browser and watch it")
+                print(gifSource)
+                gifSource = parseVideo(gifSource)
+                PlayVideo(gifSource)
             elif str(wantToPlay).lower() == 'no':
                 clip.copy("")
             want = wantToPlay
@@ -223,6 +230,20 @@ elif option == "Post by Own":
         with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
         RedGifs.home(currentPath)
+
+    # If User Wants to Post a Text to Reddit
+    elif secondOption == "Post Text":
+
+        # Get Video URL
+        PostBox("Enter the Text", False)
+        text = str(clip.paste()).split('+')[0]
+
+        # Title for the Video
+        TitleOfThePost = pg.prompt(
+            f"Enter the Title for this video", config["Bot Name"])
+
+        # Post to Reddit
+        RedGifs.openAndPostText(TitleOfThePost, message=text)
 
     # If User Wants to Post a Particular Link to Reddit
     elif secondOption == "Post Images":

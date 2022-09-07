@@ -3,11 +3,14 @@ from tkinter.filedialog import askopenfilename
 import pyperclip as clip
 
 # A Component for Postbox or for Selecting a Image and a Text Post of it 
-def PostBox(title):
+def PostBox(title, imageSelection = True):
 
     # Root of the window and it's property 
     root = Tk()
-    root.geometry("500x500")
+    if imageSelection == True:
+        root.geometry("500x500")
+    else:
+        root.geometry("500x400")
     root.title(title)
     root.resizable(width=False, height=False)
     PathOfImage = StringVar()
@@ -32,14 +35,20 @@ def PostBox(title):
     textbox = Text(root, height=15, width=60)
     textbox.place(x=8, y=60)
 
-    btn = Button(root, text="Select Image", command=GetImage)
-    btn.place(x=30, y=325)
+    if imageSelection == True:
+        btn = Button(root, text="Select Image", command=GetImage)
+        btn.place(x=30, y=325)
 
-    labl = Label(root, text=f"Select Images to Upload")
-    labl.config(font=("Courier", 11))
-    labl.place(x=115, y=325)
+        labl = Label(root, text=f"Select Images to Upload")
+        labl.config(font=("Courier", 11))
+        labl.place(x=115, y=325)
 
-    btn3 = Button(root, text="Next", command=MoveToNext)
-    btn3.place(x=225, y=430)
+        btn3 = Button(root, text="Next", command=MoveToNext)
+        btn3.place(x=225, y=430)
+    else:
+        btn3 = Button(root, text="Next", command=MoveToNext)
+        btn3.place(x=225, y=330)
 
     root.mainloop()
+
+# PostBox("Hello", False)
