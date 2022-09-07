@@ -353,21 +353,22 @@ class RedGifs:
             subreddit = reddit.subreddit(i)
             reddit.validate_on_submit = True
             try:
-                with open("bannedSubreddits.txt", 'r') as f:
+                with open("noTextPost.txt", 'r') as f:
                     subreds = f.readlines()
             except FileNotFoundError:
-                with open("bannedSubreddits.txt", 'w') as f:
+                with open("noTextPost.txt", 'w') as f:
                     f.write("")
             finally:
-                with open("bannedSubreddits.txt", 'r') as f:
+                with open("noTextPost.txt", 'r') as f:
                     subreds = f.readlines()
             if f"{i}\n" not in subreds:
                 try:
-                    subreddit.submit(title, selftext=message, nsfw=True)
+                    subreddit.submit(title, selftext=message, nsfw=False)
                     print(f"Successfully Posted in {i}")
                 except RedditAPIException:
-                    with open("bannedSubreddits.txt", "a") as f:
-                        f.write(f"{i}\n")
+                    if len(subreddits) != 0:
+                        with open("noTextPost.txt", "a") as f:
+                            f.write(f"{i}\n")
             else:
                 print(f"Skipped Sub Reddit {i} because it is BlackListed")
             # print(title, message)
