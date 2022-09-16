@@ -1,5 +1,10 @@
 # Import module
-from tkinter import *
+try:
+    from tkinter import *
+except ImportError:
+    print("tk not Found. Try installing it via your package manager")
+    import sys
+    sys.exit(8)
 from tkinter.scrolledtext import ScrolledText
 import pyperclip as clip
 from tkinter import ttk
