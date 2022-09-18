@@ -1,13 +1,11 @@
 import json
-import time
 import pymsgbox as pg
 import os
 import pyperclip as clip
 from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
 from GraphicalElements.PostBox import PostBox
-from Providers.Reddit.Reddit import Reddit
+from Providers.Reddit.Reddit import DownloadSavedVids, Reddit
 from Providers.Redgifs.Redgifs import RedGifs
-import vlc, pafy
 
 from Providers.YouTube.main import parseVideo
 from components.videoPlayer import PlayVideo
@@ -37,7 +35,7 @@ finally:
 
 # User Options to choose from
 option = pg.confirm(f"Reddit NSFW Automator", f'Posting on Reddit : {config["Bot Name"]}', buttons=[
-                    "Automate", "Post by Own", "Delete Post/Comments Based on Karma"])
+                    "Automate", "Post by Own", "Delete Post/Comments Based on Karma", "Download Saved Vids of Reddit"])
 
 # If User wants to automate each and every process 
 if str(option) == 'Automate':
@@ -278,6 +276,10 @@ elif option == "Post by Own":
         with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
         RedGifs.home(currentPath)
+
+
+elif option == "Download Saved Vids of Reddit":
+    DownloadSavedVids()
 
 else:
     exit()

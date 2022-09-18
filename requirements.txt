@@ -17,6 +17,7 @@ PyMsgBox==1.0.9
 pyperclip==1.8.2
 python-vlc==3.0.16120
 PyYAML==6.0
+redvid==1.2.0
 requests==2.27.1
 six==1.16.0
 soupsieve==2.3.2.post1

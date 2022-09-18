@@ -1,11 +1,15 @@
 import json
+import os
 import random
+import re
 import socket
 import sys
 import webbrowser
 import praw
 import pymsgbox as pg
-
+from redvid import Downloader
+import urllib.request
+import requests
 from Providers.Redgifs.Redgifs import RedGifs
 
 
@@ -156,3 +160,82 @@ class Reddit:
         refresh_token = reddit.auth.authorize(params["code"])
         Reddit.send_message(client, f"Refresh token: {refresh_token}")
         return refresh_token
+
+
+def DownloadSavedVids():
+
+    # open the config file
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+    currentPath = RedGifs.RedgifsHome()
+    try:
+        with open("reddit-secret.json", "r") as f:
+            creds = json.load(f)
+    except FileNotFoundError:
+        Reddit.createRedditApp(config)
+    finally:
+        with open("reddit-secret.json", "r") as f:
+            creds = json.load(f)
+    RedGifs.home(currentPath)
+
+    reddit = praw.Reddit(client_id=creds['client_id'],
+                         client_secret=creds['client_secret'],
+                         user_agent=creds['user_agent'],
+                         redirect_uri=creds['redirect_uri'],
+                         refresh_token=creds['refresh_token'])
+    
+
+    out_filename = 'alreadyDownloaded.txt'
+    try:
+        os.mkdir("Reddit_Saved_Vods")
+    except:
+        pass
+    curretLoc = os.getcwd()
+    os.chdir("Reddit_Saved_Vods")
+
+    try:
+        with open(f"{out_filename}.txt", 'r') as f:
+            pass
+    except FileNotFoundError:
+        with open(f"{out_filename}.txt", 'w') as f:
+            pass
+    finally:
+        with open(f"{out_filename}.txt", 'r') as f:
+            urls = f.readlines()
+
+    with open(out_filename, 'w') as out_file:
+        for item in reddit.user.me().saved(limit=None):
+            submission = reddit.submission(id=item.id)
+            try:
+
+                url = submission.url
+                if f'{url}\n' not in urls:
+
+                    if str(url).split(".")[len(str(url).split("."))-1] == "gifv" or str(url).split(".")[len(str(url).split("."))-1] == "gif" or str(url).split(".")[len(str(url).split("."))-1] == "jpg":
+                        nameOfVid = f'{submission.title}.mp4'.replace(" ", "_")
+                        urllib.request.urlretrieve(url, nameOfVid)
+
+                    elif str(url).split('/')[2] == 'redgifs.com' or str(url).split('/')[2] == "www.redgifs.com":
+                        redgif_id = re.match(r'.*/(.*?)/?$', url).group(1)
+                        headers = {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                            'Chrome/90.0.4430.93 Safari/537.36',
+                        }
+                        content = requests.get(f'https://api.redgifs.com/v2/gifs/{redgif_id}', headers=headers).json()
+                        video = requests.get(url=content['gif']["urls"]['hd'], headers=headers)
+                        open(f"{str(submission.title).replace(' ', '_').replace('.', '').replace(',', '').replace('?', '').replace('/', '')}.mp4", 'wb').write(video.content)
+
+                    elif str(url).split('/')[2] == "v.redd.it":
+                        downloadRedVid = Downloader(max_q=True)
+                        downloadRedVid.url = url
+                        downloadRedVid.download()
+                    else:
+                        print(f'{url} got an error!! Please check if this is correct or not')
+                    
+                    out_file.write(f'{url}\n')
+
+            except BaseException as e:
+                print(e)
+
+    RedGifs.home(curretLoc)
