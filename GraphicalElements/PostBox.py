@@ -50,5 +50,3 @@ def PostBox(title, imageSelection = True):
         btn3.place(x=225, y=330)
 
     root.mainloop()
-
-# PostBox("Hello", False)

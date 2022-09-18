@@ -7,7 +7,6 @@ import praw
 from GraphicalElements.OptionsMenu import GetRedditSub
 from praw.exceptions import RedditAPIException
 import pymsgbox as pg
-import pafy
 
 from GraphicalElements.OptionsMenu import GetRedditTag
 

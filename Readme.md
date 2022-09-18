@@ -130,8 +130,10 @@ This project is used to automate Reddit and Redgifs so that you can grow up your
   - [x] Get a Particular Gif/Photo from a selected Subreddit
   - [x] Post a Particular URL
   - [x] Post Multiple Images on Reddit without even opening a single browser
+  - [x] Post Text to Multiple Sub reddits
 - [x] Delete your Post or Comments based on a set amount of Likes/Karma
     - [x] This set amount can be changable
+- [x] Download Saved Vids from Reddit
 
 See the [open issues](https://github.com/coderaman07/redbot/issues) for a full list of proposed features (and known issues).
 
@@ -170,9 +172,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 Name - Aman
-Twitter - [@BugsOverflow](https://twitter.com/BugsOverflow)  
+Twitter - [@coderaman7](https://twitter.com/coderaman7)  
 Email - bugsoverflow@gmail.com  
-Website Connect - https://codeitdown.ml/contact
+Website Connect - https://codeitdown.vercel.app/contact
 
 Project Link: [https://github.com/coderaman07/redbot](https://github.com/coderaman07/redbot)
 

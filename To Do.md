@@ -17,3 +17,7 @@
 - [x] Simplify the Code
 - [x] Easy to Get Started
 - [x] Upload Multiple Images
+- [x] promote the posts
+- [x] Download Saved Posts from Reddit
+- [x] Added Support for multiple websites
+- [x] Write Text to the Subreddits
