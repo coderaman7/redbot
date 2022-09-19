@@ -195,17 +195,17 @@ def DownloadSavedVids():
     os.chdir("Reddit_Saved_Vods")
 
     try:
-        with open(f"{out_filename}.txt", 'r') as f:
+        with open(out_filename, 'r') as f:
             pass
     except FileNotFoundError:
-        with open(f"{out_filename}.txt", 'w') as f:
+        with open(out_filename, 'w') as f:
             pass
     finally:
-        with open(f"{out_filename}.txt", 'r') as f:
+        with open(out_filename, 'r') as f:
             urls = f.readlines()
 
     with open(out_filename, 'w') as out_file:
-        for item in reddit.user.me().saved(limit=None):
+        for item in reddit.user.me().saved(limit=1):
             submission = reddit.submission(id=item.id)
             try:
 
@@ -237,7 +237,6 @@ def DownloadSavedVids():
 
             except BaseException as e:
                 print(e)
-
             submission.unsave()
 
     RedGifs.home(curretLoc)
