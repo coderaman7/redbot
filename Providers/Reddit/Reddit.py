@@ -224,7 +224,7 @@ def DownloadSavedVids():
                         }
                         content = requests.get(f'https://api.redgifs.com/v2/gifs/{redgif_id}', headers=headers).json()
                         video = requests.get(url=content['gif']["urls"]['hd'], headers=headers)
-                        open(f"{str(submission.title).replace(' ', '_').replace('.', '').replace(',', '').replace('?', '').replace('/', '')}.mp4", 'wb').write(video.content)
+                        open(f"{str(submission.title).replace(' ', '_').replace('.', '').replace(',', '').replace('?', '').replace('/', '')[:25]}.mp4", 'wb').write(video.content)
 
                     elif str(url).split('/')[2] == "v.redd.it":
                         downloadRedVid = Downloader(max_q=True)
