@@ -205,7 +205,7 @@ def DownloadSavedVids():
             urls = f.readlines()
 
     with open(out_filename, 'w') as out_file:
-        for item in reddit.user.me().saved(limit=1):
+        for item in reddit.user.me().saved(limit=None):
             submission = reddit.submission(id=item.id)
             try:
 
