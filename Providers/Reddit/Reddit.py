@@ -238,4 +238,6 @@ def DownloadSavedVids():
             except BaseException as e:
                 print(e)
 
+            submission.unsave()
+
     RedGifs.home(curretLoc)
