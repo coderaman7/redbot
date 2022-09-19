@@ -204,7 +204,7 @@ def DownloadSavedVids():
         with open(out_filename, 'r') as f:
             urls = f.readlines()
 
-    with open(out_filename, 'w') as out_file:
+    with open(out_filename, 'a') as out_file:
         for item in reddit.user.me().saved(limit=None):
             submission = reddit.submission(id=item.id)
             try:
@@ -237,6 +237,9 @@ def DownloadSavedVids():
 
             except BaseException as e:
                 print(e)
-            # submission.unsave()
+            try:
+                submission.unsave()
+            except:
+                continue
 
     RedGifs.home(curretLoc)
