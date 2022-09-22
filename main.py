@@ -1,10 +1,11 @@
 import json
+import re
 import pymsgbox as pg
-import os
+import os, requests
 import pyperclip as clip
 from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
 from GraphicalElements.PostBox import PostBox
-from Providers.Reddit.Reddit import DownloadSavedVids, Reddit
+from Providers.Reddit.Reddit import DownloadSavedVids, DownloadandPlayVidFromSaved, PostOnRedditFromSaved, Reddit, getURLfromSaved, removeFromSaved
 from Providers.Redgifs.Redgifs import RedGifs
 
 from Providers.YouTube.main import parseVideo
@@ -93,7 +94,7 @@ elif option == "Delete Post/Comments Based on Karma":
 
 elif option == "Post by Own":
     secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=[
-                              "Mine Video", "From Reddit", "Post a Particular Link", "Post Images", "Post Text"])
+                              "Mine Video", "From Reddit", "Post from Saved Vids", "Post a Particular Link", "Post Images", "Post Text"])
 
     # If the User want to Customize each and every part of upload and mine the best video
     if secondOption == "Mine Video":
@@ -276,6 +277,12 @@ elif option == "Post by Own":
         with open("Posted.txt", 'a') as f:
             f.write(f'{videoURL}\n')
         RedGifs.home(currentPath)
+
+    elif secondOption == "Post from Saved Vids":
+        url, idOfPost = getURLfromSaved()
+        DownloadandPlayVidFromSaved(url)
+        PostOnRedditFromSaved(url)
+        removeFromSaved(idOfPost)
 
 
 elif option == "Download Saved Vids of Reddit":

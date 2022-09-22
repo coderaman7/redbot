@@ -10,7 +10,10 @@ import pymsgbox as pg
 from redvid import Downloader
 import urllib.request
 import requests
+from GraphicalElements.OptionsMenu import GetUserTag
 from Providers.Redgifs.Redgifs import RedGifs
+from components.videoPlayer import PlayVideo
+import pyperclip as clip
 
 
 class Reddit:
@@ -243,3 +246,106 @@ def DownloadSavedVids():
                 continue
 
     RedGifs.home(curretLoc)
+
+def getURLfromSaved():
+
+    # open the config file
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+    currentPath = RedGifs.RedgifsHome()
+    try:
+        with open("reddit-secret.json", "r") as f:
+            creds = json.load(f)
+    except FileNotFoundError:
+        Reddit.createRedditApp(config)
+    finally:
+        with open("reddit-secret.json", "r") as f:
+            creds = json.load(f)
+    RedGifs.home(currentPath)
+
+    reddit = praw.Reddit(client_id=creds['client_id'],
+                         client_secret=creds['client_secret'],
+                         user_agent=creds['user_agent'],
+                         redirect_uri=creds['redirect_uri'],
+                         refresh_token=creds['refresh_token'])
+    for item in reddit.user.me().saved(limit=10):
+        submission = reddit.submission(id=item.id)
+        try:
+            return submission.url, item.id
+        except:
+            pass
+
+def removeFromSaved(idOfPost):
+
+    # open the config file
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+    currentPath = RedGifs.RedgifsHome()
+    try:
+        with open("reddit-secret.json", "r") as f:
+            creds = json.load(f)
+    except FileNotFoundError:
+        Reddit.createRedditApp(config)
+    finally:
+        with open("reddit-secret.json", "r") as f:
+            creds = json.load(f)
+    RedGifs.home(currentPath)
+
+    reddit = praw.Reddit(client_id=creds['client_id'],
+                         client_secret=creds['client_secret'],
+                         user_agent=creds['user_agent'],
+                         redirect_uri=creds['redirect_uri'],
+                         refresh_token=creds['refresh_token'])
+    submission = reddit.submission(id=idOfPost)
+    try:
+        submission.unsave()
+    except:
+        pass
+
+def DownloadandPlayVidFromSaved(url):
+    redgif_id = re.match(r'.*/(.*?)/?$', url).group(1)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+        'Chrome/90.0.4430.93 Safari/537.36',
+    }
+    content = requests.get(
+        f'https://api.redgifs.com/v2/gifs/{redgif_id}', headers=headers).json()
+    video = requests.get(
+         url=content['gif']["urls"]['hd'], headers=headers)
+    open(f"{str('tempvid').replace(' ', '_').replace('.', '').replace(',', '').replace('?', '').replace('/', '')[:25]}.mp4", 'wb').write(video.content)
+    choice = pg.confirm("Want to Play the Video??",
+                           "Play it??", buttons=["Yes", "No"])
+    if choice == "Yes":
+        PlayVideo('tempvid.mp4')
+    os.remove("tempVid.mp4")
+
+def PostOnRedditFromSaved(url):
+    # open the config file
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+        
+    # Title for the Video
+    TitleOfThePost = pg.prompt(
+        f"Enter the Title for this video", config["Bot Name"])
+
+    subredditToPromote = ""
+    crossPost = False
+    promotion = pg.confirm(
+           "Do you want to Promote a Subreddit??", "Promotion", buttons=['Yes', 'No'])
+    if promotion == 'Yes':
+        GetUserTag(options=RedGifs.GetRedditTags(),
+                       title="Select the Subreddit to Promote")
+        subredditToPromote = clip.paste()
+        crossPost = True
+
+    # Post to Reddit
+    RedGifs.openAndPost(TitleOfThePost, url,
+                            crossPost=crossPost, toPromote=subredditToPromote)
+
+    # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit
+    currentPath = RedGifs.RedgifsHome()
+    with open("Posted.txt", 'a') as f:
+        f.write(f'{url}\n')
+    RedGifs.home(currentPath)
