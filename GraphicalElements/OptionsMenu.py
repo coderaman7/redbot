@@ -116,3 +116,4 @@ def GetRedditTag(options: list):
 
     # Run it indefenitly times 
     root.mainloop()
+

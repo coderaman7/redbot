@@ -8,11 +8,8 @@
 - [x] Provide a Facility to get a Post from a Subreddit and Post it using the link and Text of the post as my Own
 - [x] Provide a Facility to approve as soon as it's uploaded on Reddit
 - [x] Preview on Reddit Mobile App as Uploaded
-- [ ] Support for Multiple Website's
 - [x] Create a New Config File if not present
-- [ ] Help to Create the Dev Accounts
 - [x] Customize the App
-- [ ] Update the Script without GIT
 - [x] Write Documentation for this
 - [x] Simplify the Code
 - [x] Easy to Get Started
@@ -21,3 +18,10 @@
 - [x] Download Saved Posts from Reddit
 - [x] Added Support for multiple websites
 - [x] Write Text to the Subreddits
+
+- [ ] Make the Saved Vids Choosable from different Vids
+- [ ] Support for Multiple Website's
+- [ ] Help to Create the Dev Accounts
+- [ ] Update the Script without GIT
+- [ ] Keep Redgifs Hidden as an Option for NSFW
+- [ ] Make it for Public Use

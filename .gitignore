@@ -3,3 +3,4 @@ __pycache__
 test.py
 *.txt
 Reddit_Saved_Vods/
+*.mp4

@@ -1,20 +1,15 @@
-import json
-import re
+import random
 import pymsgbox as pg
-import os, requests
+import os, json
 import pyperclip as clip
 from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
 from GraphicalElements.PostBox import PostBox
-from Providers.Reddit.Reddit import DownloadSavedVids, DownloadandPlayVidFromSaved, PostOnRedditFromSaved, Reddit, getURLfromSaved, removeFromSaved
-from Providers.Redgifs.Redgifs import RedGifs
+from Providers.Reddit.Reddit import DeleteCommentsBelowKarma, DeletePostsBelowKarma, GetGifFromReddit, GetSubreddits, PlayCustomizedVideo, PlayFromRedGifs, PostOnReddit, PostOnRedditFromURL, Reddit, askIfToPromote, checkForError, getURLSfromSaved, playfromImagurAndVeddit, removeFromSaved, writeInPostedDB
+from Providers.Redgifs.Redgifs import RedGifs, getBestTag
 
 from Providers.YouTube.main import parseVideo
 from components.videoPlayer import PlayVideo
-
-BotVersion = "1.2.3"
-
-# To Do for this Bot
-# Discord Reddit Twitter YouTube Snapchat Instagram
+from BotVersion import Bot_Version
 
 # Open config file for this bot else create
 try:
@@ -25,7 +20,7 @@ except FileNotFoundError:
                         "BOT Name", f"{os.getlogin()}'s BOT")
     username = pg.prompt("What's your Reddit Username",
                         "Reddit username")
-    Version = BotVersion
+    Version = Bot_Version
     dataToJSON = {"Bot Name": BotName, "Version": Version, "username": username}
     with open("config.json", "a") as f:
         json.dump(dataToJSON, f, indent=4)
@@ -36,39 +31,19 @@ finally:
 
 # User Options to choose from
 option = pg.confirm(f"Reddit NSFW Automator", f'Posting on Reddit : {config["Bot Name"]}', buttons=[
-                    "Automate", "Post by Own", "Delete Post/Comments Based on Karma", "Download Saved Vids of Reddit"])
+                    "Automate", "Post by Own", "Delete Post/Comments Based on Karma"])
 
 # If User wants to automate each and every process 
 if str(option) == 'Automate':
     want = "Yes"
     while want == "Yes":
-        tag = RedGifs.getBestTag(RedGifs.getAllTags())
-        videoURL, VidSource = RedGifs.GetFromRedgifs(tag)
-
-        # Alert if User wants to see the vide ( which can't be changed )
-        wantToPlay = pg.confirm("Want to Play the Video??",
-                                f'Want to Play the Video Under Cateogary of {tag}', buttons=['Yes', 'No'])
-        if str(wantToPlay).lower() == 'yes':
-            PlayVideo(VidSource)
-        elif str(wantToPlay).lower() == 'no':
-            clip.copy("")
-        else:
-            pg.alert("Program Exited")
-            exit()
+        tag = getBestTag(RedGifs.getAllTags())
+        videoURL = RedGifs.GetFromRedgifs(tag)
+        PlayFromRedGifs(videoURL)
         want = pg.confirm("Do you want to change the Video??", "Confirmation", buttons=["Yes", "No"])
-
-    # Title of the Post will be the Tag itself 
-    TitleOfThePost = tag
-    
-    # Post on Reddit 
-    RedGifs.openAndPost(TitleOfThePost, videoURL)
-
-    # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit 
-    currentPath = RedGifs.RedgifsHome()
-    with open("Posted.txt", 'a') as f:
-        f.write(f'{videoURL}\n')
-    RedGifs.home(currentPath)
-
+    TitleOfThePost = f'#{tag}'
+    PostOnReddit(title = TitleOfThePost, url = videoURL)
+    writeInPostedDB(videoURL)
 
 # Delete Posts or Comments based on Karma 
 elif option == "Delete Post/Comments Based on Karma":
@@ -80,7 +55,7 @@ elif option == "Delete Post/Comments Based on Karma":
     if secondOption == "Comments":
         karma = pg.prompt("Enter the Karma level to be maintained on Comments", "Delete Comments based on Karma") 
         try:
-            Reddit.DeleteCommentsBelowKarma(int(karma))
+            DeleteCommentsBelowKarma(int(karma))
         except:
             pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
 
@@ -88,7 +63,7 @@ elif option == "Delete Post/Comments Based on Karma":
     elif secondOption == "Posts":
         karma = pg.prompt("Enter the Karma level to be maintained on Posts", "Delete Posts based on Karma")
         try:
-            Reddit.DeletePostsBelowKarma(int(karma))
+            DeletePostsBelowKarma(int(karma))
         except:
             pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
 
@@ -96,79 +71,39 @@ elif option == "Post by Own":
     secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=[
                               "Mine Video", "From Reddit", "Post from Saved Vids", "Post a Particular Link", "Post Images", "Post Text"])
 
-    # If the User want to Customize each and every part of upload and mine the best video
     if secondOption == "Mine Video":
-
-        # Get Tag from user and copy it to clipboard and paste it here so that we can use it for video fetching based on that tag
         GetUserTag(RedGifs.getAllTags(), "Select the Tag from the List")
         tag = clip.paste()
         want = 'Refresh'
-
-        # while loop so that we can refresh the video urls and the user can get option to change video urls which is to be uploaded
         while want == "Refresh":
-            videoURL, VidSource = RedGifs.GetFromRedgifs(tag)
+            videoURL = RedGifs.GetFromRedgifs(tag)
             wantToPlay = pg.confirm("Want to Play the Video??", f'Want to Play the Video Under Cateogary of {tag}', buttons=[
                                     'Yes', 'No', "Refresh"])
-            if str(wantToPlay).lower() == 'yes':
-                PlayVideo(VidSource)
-            elif str(wantToPlay).lower() == 'no':
-                clip.copy("")
-            elif str(wantToPlay).lower() == 'refresh':
-                clip.copy("")
-            else:
-                exit()
+            PlayFromRedGifs(videoURL)
             want = wantToPlay
-
-        # Option so that User can change the Title for the video and can customize it
-        TitleOfThePost = pg.prompt(
-            "Enter the Title of the Post", "Enter the Title of the Post")
-
-        subredditToPromote = ""
-        crossPost = False
-        promotion = pg.confirm("Do you want to Promote a Subreddit??", "Promotion", buttons=['Yes', 'No'])
-        if promotion == 'Yes':
-            GetUserTag(options=RedGifs.GetRedditTags(), title="Select the Subreddit to Promote")
-            subredditToPromote = clip.paste()
-            crossPost = True
-
-
-        # Post to Reddit
-        RedGifs.openAndPost(TitleOfThePost, videoURL, crossPost=crossPost, toPromote=subredditToPromote)
-
-        # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit
-        currentPath = RedGifs.RedgifsHome()
-        with open("Posted.txt", 'a') as f:
-            f.write(f'{videoURL}\n')
-        RedGifs.home(currentPath)
+        TitleOfThePost = pg.prompt("Enter the Title of the Post", "Enter the Title of the Post")
+        subredditToPromote, crossPost = askIfToPromote()
+        PostOnReddit(title=TitleOfThePost, url=videoURL, crossPost=crossPost, toPromote=subredditToPromote)
+        writeInPostedDB(videoURL)
     
-    # If User Wants to Grab a link from a Sub-Reddit
     elif secondOption == "From Reddit":
-
-        # Get Tag from user and copy it to clipboard and paste it here so that we can use it for video fetching based on that tag
-        subreddit = RedGifs.GetRedditTags()
-        GetRedditTag(subreddit)
+        GetRedditTag(GetSubreddits(toPost=False))
         sub = clip.paste()
+        checkForError("subreddit", sub)
         want = 'Refresh'
-
-        # while loop so that we can refresh the video urls and the user can get option to change video urls which is to be uploaded
         while want == "Refresh":
-
-            # Get Video Url and title and then strip it to make it a better video with SEO 
-            videoURL, title, gifSource = RedGifs.GetFromRedditGif(sub)
-            Source = str(videoURL).split("/")[2]
-
-            # If a user wants to play the video then copy the url to clipboard else clear clipboard 
-            wantToPlay = pg.confirm(f"Want to Play the Video with title {title}?? \n\nSource = {Source}",
-                                    f'Want to Play the Video from Sub-Reddit {sub}', buttons=['Yes', 'No', "Refresh"])
-            if str(wantToPlay).lower() == 'yes':
-                print(gifSource)
-                gifSource = parseVideo(gifSource)
-                PlayVideo(gifSource)
-            elif str(wantToPlay).lower() == 'no':
-                clip.copy("")
-            want = wantToPlay
-
-        # Option so that User can change the Title for the video and can customize it
+            videoURL, title = GetGifFromReddit(sub)
+            if str(videoURL).split("/")[2] in ['redgifs.com', 'www.redgifs.com', 'i.imgur.com', 'v.redd.it', 'i.redd.it']:
+                if str(videoURL).split("/")[2] in ['redgifs.com', 'www.redgifs.com']:
+                    PlayFromRedGifs(videoURL)
+                elif str(videoURL).split("/")[2] in ['i.imgur.com', 'v.redd.it', 'i.redd.it']:
+                    playfromImagurAndVeddit(videoURL)
+            else:
+                clip.copy(videoURL)
+                pg.alert(f"Video can't be played in {config['Bot Name']}. It's Location has been copied to your clipboard.\nUse any browser's incognito mode to view the video.")
+                pg.alert("Software is paused while you watch the video.\nClick OK when you've watched the video.")
+            want = pg.confirm("Post this Video on Reddit or fetch another one??",
+                              "Confirm Dialogue", buttons=["Post", "Refresh"])
         CustomTitle = pg.confirm(
             f"Want to Change the title : {title}", config["Bot Name"], buttons=["Yes", "NO"])
         if str(CustomTitle).lower() == "yes":
@@ -179,78 +114,24 @@ elif option == "Post by Own":
             TitleOfThePost = title
         else:
             exit()
+        subredditToPromote, crossPost = askIfToPromote()
+        PostOnReddit(title = TitleOfThePost, url=videoURL, crossPost=crossPost, toPromote=subredditToPromote)
+        writeInPostedDB(videoURL)
 
-        subredditToPromote = ""
-        crossPost = False
-        promotion = pg.confirm(
-            "Do you want to Promote a Subreddit??", "Promotion", buttons=['Yes', 'No'])
-        if promotion == 'Yes':
-            GetUserTag(options=RedGifs.GetRedditTags(),
-                       title="Select the Subreddit to Promote")
-            subredditToPromote = clip.paste()
-            crossPost = True
-
-        # Post to Reddit
-        RedGifs.openAndPost(TitleOfThePost, videoURL,
-                            crossPost=crossPost, toPromote=subredditToPromote)
-
-        # Change the Path and write the video url to a file so that next time that won't be uploaded on Reddit
-        currentPath = RedGifs.RedgifsHome()
-        with open("Posted.txt", 'a') as f:
-            f.write(f'{videoURL}\n')
-        RedGifs.home(currentPath)
-
-    # If User Wants to Post a Particular Link to Reddit
     elif secondOption == "Post a Particular Link":
-
-        # Get Video URL
         videoURL = pg.prompt(f"Enter the URL", config["Bot Name"])
+        PostOnRedditFromURL(videoURL)
 
-        # Title for the Video
-        TitleOfThePost = pg.prompt(
-            f"Enter the Title for this video", config["Bot Name"])
-
-        subredditToPromote = ""
-        crossPost = False
-        promotion = pg.confirm(
-            "Do you want to Promote a Subreddit??", "Promotion", buttons=['Yes', 'No'])
-        if promotion == 'Yes':
-            GetUserTag(options=RedGifs.GetRedditTags(),
-                       title="Select the Subreddit to Promote")
-            subredditToPromote = clip.paste()
-            crossPost = True
-
-        # Post to Reddit
-        RedGifs.openAndPost(TitleOfThePost, videoURL,
-                            crossPost=crossPost, toPromote=subredditToPromote)
-
-        # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit
-        currentPath = RedGifs.RedgifsHome()
-        with open("Posted.txt", 'a') as f:
-            f.write(f'{videoURL}\n')
-        RedGifs.home(currentPath)
-
-    # If User Wants to Post a Text to Reddit
     elif secondOption == "Post Text":
-
-        # Get Video URL
         PostBox("Enter the Text", False)
         text = str(clip.paste()).split('+')[0]
+        TitleOfThePost = pg.prompt(f"Enter the Title for this video", config["Bot Name"])
+        PostOnReddit(title=TitleOfThePost, message=text)
 
-        # Title for the Video
-        TitleOfThePost = pg.prompt(
-            f"Enter the Title for this video", config["Bot Name"])
-
-        # Post to Reddit
-        RedGifs.openAndPostText(TitleOfThePost, message=text)
-
-    # If User Wants to Post a Particular Link to Reddit
     elif secondOption == "Post Images":
-
         PostBox("Upload Images")
         TitleOfThePost, videoURL = str(clip.paste()).split("+")
-        videoURL = videoURL.replace("(", "").replace(")", "").replace(" ", "")
-        videoURL = videoURL.replace("'", "").split(",")
+        videoURL = videoURL.replace("(", "").replace(")", "").replace(" ", "").replace("'", "").split(",")
         images = []
         num = 0
         for i in videoURL:
@@ -258,35 +139,24 @@ elif option == "Post by Own":
             imageDict = {}
             imageDict["image_path"] = i
             images.append(imageDict)
-
-        subredditToPromote = ""
-        crossPost = False
-        promotion = pg.confirm(
-            "Do you want to Promote a Subreddit??", "Promotion", buttons=['Yes', 'No'])
-        if promotion == 'Yes':
-            GetUserTag(options=RedGifs.GetRedditTags(),
-                       title="Select the Subreddit to Promote")
-            subredditToPromote = clip.paste()
-            crossPost = True
-
-        # Post to Reddit
-        RedGifs.UploadImages(False, images, TitleOfThePost, subredditToPromote)
-
-        # Change the Path and write the vedio url to a file so that next time that won't be uploaded on Reddit
-        currentPath = RedGifs.RedgifsHome()
-        with open("Posted.txt", 'a') as f:
-            f.write(f'{videoURL}\n')
-        RedGifs.home(currentPath)
+        subredditToPromote, crossPost = askIfToPromote()
+        PostOnReddit(images = images, title = TitleOfThePost, toPromote=subredditToPromote, crossPost=crossPost)
 
     elif secondOption == "Post from Saved Vids":
-        url, idOfPost = getURLfromSaved()
-        DownloadandPlayVidFromSaved(url)
-        PostOnRedditFromSaved(url)
-        removeFromSaved(idOfPost)
+        urls, idOfPosts = getURLSfromSaved()
+        urlIndex = 0
+        toPost = "False"
+        print("Got all the links from reddit")
+        while toPost == "False":
+            PlayCustomizedVideo(urls[urlIndex])
+            toPost = pg.confirm("Do you want to Post this??", "Post it??", buttons=["True", "False"])
+            if toPost == "False":
+                urlIndex += 1
+        PostOnRedditFromURL(urls[urlIndex])
+        removeFromSaved(idOfPosts[urlIndex])
 
-
-elif option == "Download Saved Vids of Reddit":
-    DownloadSavedVids()
+# elif option == "Download Saved Vids of Reddit":
+#     DownloadSavedVids()
 
 else:
     exit()

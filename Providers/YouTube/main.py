@@ -9,3 +9,4 @@ def parseVideo(videoURL):
             exit()
     except IndexError:
         return videoURL
+        
