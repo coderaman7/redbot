@@ -19,6 +19,7 @@
 - [x] Added Support for multiple websites
 - [x] Write Text to the Subreddits
 
+- [ ] Upload Videos
 - [ ] Make the Saved Vids Choosable from different Vids
 - [ ] Support for Multiple Website's
 - [ ] Help to Create the Dev Accounts
