@@ -7,6 +7,7 @@ from components.videoPlayer import PlayVideo
 import pyperclip as clip
 from praw.exceptions import RedditAPIException
 
+PlayableVideo = False
 
 class Reddit:
 
@@ -160,7 +161,7 @@ def getURLSfromSaved():
     reddit, config = readAndGetRedditAndBotConfig()
     urls = []
     ids = []
-    for item in reddit.user.me().saved(limit=None):
+    for item in reddit.user.me().saved(limit=20):
         submission = reddit.submission(id=item.id)
         try:
             urls.append(submission.url)
@@ -185,24 +186,28 @@ def PostOnRedditFromURL(url):
     PostOnReddit(title=TitleOfThePost, url=url, crossPost=crossPost, toPromote=subredditToPromote)
     writeInPostedDB(url)
 
+
 def PlayFromRedGifs(url):
     redgif_id = re.match(r'.*/(.*?)/?$', url).group(1)
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-        'Chrome/90.0.4430.93 Safari/537.36',
-    }
-    content = requests.get(
-        f'https://api.redgifs.com/v2/gifs/{str(redgif_id).lower()}', allow_redirects=True, headers=headers).json()
-    print(redgif_id)
-    video = requests.get(
-        url=content['gif']["urls"]['hd'], headers=headers)
-    open(
-        f"{str('tempvid').replace(' ', '_').replace('.', '').replace(',', '').replace('?', '').replace('/', '')[:25]}.mp4", 'wb').write(video.content)
-    choice = pg.confirm("Want to Play the Video??",
-                        "Play it??", buttons=["Yes", "No"])
-    if choice == "Yes":
-        PlayVideo('tempvid.mp4')
-    os.remove("tempVid.mp4")
+    if PlayableVideo:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/90.0.4430.93 Safari/537.36',
+        }
+        content = requests.get(
+            f'https://api.redgifs.com/v2/gifs/{str(redgif_id).lower()}', allow_redirects=True, headers=headers).json()
+        print(redgif_id)
+        print(content)
+        video = requests.get(url=content['gif']["urls"]['hd'], headers=headers)
+        open(
+            f"{str('tempvid').replace(' ', '_').replace('.', '').replace(',', '').replace('?', '').replace('/', '')[:25]}.mp4", 'wb').write(video.content)
+        choice = pg.confirm("Want to Play the Video??",
+                            "Play it??", buttons=["Yes", "No"])
+        if choice == "Yes":
+            PlayVideo('tempvid.mp4')
+        os.remove("tempVid.mp4")
+    else:
+        print(redgif_id)
 
 def playfromImagurAndVeddit(url):
     downloadRedVid = Downloader(max_q=True)
@@ -454,13 +459,19 @@ def askIfToPromote():
         crossPost = True
     return subredditToPromote, crossPost
 
-
 def PlayCustomizedVideo(url):
-    if str(url).split('/')[2] in ['redgifs.com', 'www.redgifs.com']:
-        PlayFromRedGifs(url)
-    elif str(url).split('/')[2] in ['i.imgur.com', 'v.redd.it', 'i.redd.it']:
-        try:
-            playfromImagurAndVeddit(url)
-        except:
-            print("Video can't be played due to some error")
-
+    reddit, config = readAndGetRedditAndBotConfig()
+    if PlayableVideo:
+        if str(url).split('/')[2] in ['redgifs.com', 'www.redgifs.com']:
+            PlayFromRedGifs(url)
+        elif str(url).split('/')[2] in ['i.imgur.com', 'v.redd.it', 'i.redd.it']:
+            try:
+                playfromImagurAndVeddit(url)
+            except:
+                print("Video can't be played due to some error")
+    else:
+        clip.copy(url)
+        pg.alert(
+            f"Video can't be played in {config['Bot Name']}. It's Location has been copied to your clipboard.\nUse any browser's incognito mode to view the video.")
+        pg.alert(
+            "Software is paused while you watch the video.\nClick OK when you've watched the video.")
