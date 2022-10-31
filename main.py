@@ -1,4 +1,3 @@
-import random
 import pymsgbox as pg
 import os, json
 import pyperclip as clip
@@ -10,6 +9,9 @@ from Providers.Redgifs.Redgifs import RedGifs, getBestTag
 from Providers.YouTube.main import parseVideo
 from components.videoPlayer import PlayVideo
 from BotVersion import Bot_Version
+from components.ScriptUpdate.main import GetUpdate
+
+# GetUpdate()
 
 # Open config file for this bot else create
 try:
@@ -21,17 +23,24 @@ except FileNotFoundError:
     username = pg.prompt("What's your Reddit Username",
                         "Reddit username")
     Version = Bot_Version
-    dataToJSON = {"Bot Name": BotName, "Version": Version, "username": username}
+    dataToJSON = {"Bot Name": BotName, "Version": Version, "username": username, "nsfw": False}
     with open("config.json", "a") as f:
         json.dump(dataToJSON, f, indent=4)
 finally:
     with open('config.json', 'r') as f:
         config = json.load(f)
 
+options = [
+    "Automate",
+    "Post by Own",
+    "Delete Post/Comments Based on Karma"
+]
+
+if config["nsfw"] == "false":
+    options.pop(options.index("Automate"))
 
 # User Options to choose from
-option = pg.confirm(f"Reddit NSFW Automator", f'Posting on Reddit : {config["Bot Name"]}', buttons=[
-                    "Automate", "Post by Own", "Delete Post/Comments Based on Karma"])
+option = pg.confirm(f"Reddit Automator", f'Posting on Reddit : {config["Bot Name"]}', buttons=options)
 
 # If User wants to automate each and every process 
 if str(option) == 'Automate':
@@ -68,8 +77,19 @@ elif option == "Delete Post/Comments Based on Karma":
             pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
 
 elif option == "Post by Own":
-    secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=[
-                              "Mine Video", "From Reddit", "Post from Saved Vids", "Post a Particular Link", "Post Images", "Post Text"])
+    optionsForPostByOwn = [
+        "Mine Video",
+        "From Reddit",
+        "Post from Saved Vids",
+        "Post a Particular Link",
+        "Post Images",
+        "Post Text"
+    ]
+
+    if config["nsfw"] == "false":
+        optionsForPostByOwn.pop(optionsForPostByOwn.index("Mine Video"))
+
+    secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=optionsForPostByOwn)
 
     if secondOption == "Mine Video":
         GetUserTag(RedGifs.getAllTags(), "Select the Tag from the List")
