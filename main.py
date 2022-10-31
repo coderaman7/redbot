@@ -11,7 +11,7 @@ from components.videoPlayer import PlayVideo
 from BotVersion import Bot_Version
 from components.ScriptUpdate.main import GetUpdate
 
-# GetUpdate()
+GetUpdate()
 
 # Open config file for this bot else create
 try:
@@ -114,10 +114,7 @@ elif option == "Post by Own":
         while want == "Refresh":
             videoURL, title = GetGifFromReddit(sub)
             if str(videoURL).split("/")[2] in ['redgifs.com', 'www.redgifs.com', 'i.imgur.com', 'v.redd.it', 'i.redd.it']:
-                if str(videoURL).split("/")[2] in ['redgifs.com', 'www.redgifs.com']:
-                    PlayFromRedGifs(videoURL)
-                elif str(videoURL).split("/")[2] in ['i.imgur.com', 'v.redd.it', 'i.redd.it']:
-                    playfromImagurAndVeddit(videoURL)
+                PlayCustomizedVideo(videoURL)
             else:
                 clip.copy(videoURL)
                 pg.alert(f"Video can't be played in {config['Bot Name']}. It's Location has been copied to your clipboard.\nUse any browser's incognito mode to view the video.")
