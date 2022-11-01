@@ -36,7 +36,16 @@ options = [
     "Delete Post/Comments Based on Karma"
 ]
 
-if config["nsfw"] == "false":
+try:
+    config["nsfw"]
+except KeyError:
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+    config["nsfw"] = True
+    with open('config.json', 'w') as f:
+        f.write(json.dumps(config, indent=4))
+
+if config["nsfw"] == False:
     options.pop(options.index("Automate"))
 
 # User Options to choose from
@@ -86,7 +95,7 @@ elif option == "Post by Own":
         "Post Text"
     ]
 
-    if config["nsfw"] == "false":
+    if config["nsfw"] == False:
         optionsForPostByOwn.pop(optionsForPostByOwn.index("Mine Video"))
 
     secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=optionsForPostByOwn)

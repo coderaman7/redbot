@@ -18,7 +18,7 @@ def GetUpdate():
         print("*"*(space+2))
 
     res = requests.get(
-        "https://raw.githubusercontent.com/coderaman07/redbot/master/Script_Version.py").text
+        "https://raw.githubusercontent.com/coderaman7/redbot/master/BotVersion.py").text
     LatestVersion = str(res).split("=")[1].replace(
         "'", "").replace('"', "").split(".")
     CurrentVersion = str(version).split(".")
