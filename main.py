@@ -6,8 +6,6 @@ from GraphicalElements.PostBox import PostBox
 from Providers.Reddit.Reddit import DeleteCommentsBelowKarma, DeletePostsBelowKarma, GetGifFromReddit, GetSubreddits, PlayCustomizedVideo, PlayFromRedGifs, PostOnReddit, PostOnRedditFromURL, Reddit, askIfToPromote, checkForError, getURLSfromSaved, playfromImagurAndVeddit, removeFromSaved, writeInPostedDB
 from Providers.Redgifs.Redgifs import RedGifs, getBestTag
 
-from Providers.YouTube.main import parseVideo
-from components.videoPlayer import PlayVideo
 from BotVersion import Bot_Version
 from components.ScriptUpdate.main import GetUpdate
 
