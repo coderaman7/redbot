@@ -1,4 +1,11 @@
-import json, os, random, re, socket, sys, webbrowser, praw
+import json
+import os
+import random
+import re
+import socket
+import sys
+import webbrowser
+import praw
 import pymsgbox as pg
 from redvid import Downloader
 import requests
@@ -9,9 +16,10 @@ from praw.exceptions import RedditAPIException
 
 PlayableVideo = False
 
+
 class Reddit:
 
-    # Create the Reddit secret api file 
+    # Create the Reddit secret api file
     def createRedditApp(config):
 
         # Get the Client ID if blank then exit
@@ -19,17 +27,17 @@ class Reddit:
             "Enter the Client ID ( Which is just below the Bot Name on Reddit Dev Dashboard )", "Collecting Client ID")
         if clientID == None:
             exit()
-        
-        # Get the Client Secret if blank then exit 
+
+        # Get the Client Secret if blank then exit
         clientSecret = pg.prompt(
             "Enter the Client Secret", "Collecting Client Secret")
         if clientSecret == None:
             exit()
 
-        # get and generate refresh token 
+        # get and generate refresh token
         refreshToken = Reddit.main(clientID, clientSecret)
 
-        # if there's no error then create a json and write it to the file 
+        # if there's no error then create a json and write it to the file
         if refreshToken != 1:
             dataSet = {
                 "client_id": clientID,
@@ -41,7 +49,7 @@ class Reddit:
             with open("reddit-secret.json", 'w') as f:
                 json.dump(dataSet, f, indent=4)
 
-    # To Receive connection from the Reddit website itself while generating a refresh token 
+    # To Receive connection from the Reddit website itself while generating a refresh token
     def receive_connection():
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -51,12 +59,12 @@ class Reddit:
         server.close()
         return client
 
-    # When generated the close the connection and send a 200 OK message 
+    # When generated the close the connection and send a 200 OK message
     def send_message(client, message):
         client.send(f"HTTP/1.1 200 OK\r\n\r\n{message}".encode("utf-8"))
         client.close()
 
-    # Start of the refresh token generation with all access to the Reddit Account 
+    # Start of the refresh token generation with all access to the Reddit Account
     def main(clientID, ClientSecret):
         client_id = clientID
         client_secret = ClientSecret
@@ -170,6 +178,7 @@ def getURLSfromSaved():
             pass
     return urls, ids
 
+
 def removeFromSaved(idOfPost):
     reddit, config = readAndGetRedditAndBotConfig()
     submission = reddit.submission(id=idOfPost)
@@ -178,12 +187,14 @@ def removeFromSaved(idOfPost):
     except:
         pass
 
+
 def PostOnRedditFromURL(url):
     reddit, config = readAndGetRedditAndBotConfig()
     TitleOfThePost = pg.prompt(
         f"Enter the Title for this video", config["Bot Name"])
     subredditToPromote, crossPost = askIfToPromote()
-    PostOnReddit(title=TitleOfThePost, url=url, crossPost=crossPost, toPromote=subredditToPromote)
+    PostOnReddit(title=TitleOfThePost, url=url,
+                 crossPost=crossPost, toPromote=subredditToPromote)
     writeInPostedDB(url)
 
 
@@ -209,6 +220,7 @@ def PlayFromRedGifs(url):
     else:
         print(redgif_id)
 
+
 def playfromImagurAndVeddit(url):
     downloadRedVid = Downloader(max_q=True)
     downloadRedVid.url = url
@@ -217,6 +229,7 @@ def playfromImagurAndVeddit(url):
     # os.remove(str(downloadRedVid).split("/")[:-1])
     print(str(downloadRedVid).split("/")[:-1])
     # To work on it
+
 
 def checkForError(tocheckfor, dynamicVar):
     reddit, config = readAndGetRedditAndBotConfig()
@@ -228,7 +241,8 @@ def checkForError(tocheckfor, dynamicVar):
         else:
             exit()
 
-def PostOnReddit(title="Title Not Found", message="", url="", video = "", images = [], crossPost = False, toPromote = ""):
+
+def PostOnReddit(title="Title Not Found", message="", url="", video="", images=[], crossPost=False, toPromote=""):
     reddit, config = readAndGetRedditAndBotConfig()
     GetRedditSub(GetSubreddits())
     subreddits = str(clip.paste()).split("+")[:-1]
@@ -237,7 +251,8 @@ def PostOnReddit(title="Title Not Found", message="", url="", video = "", images
             Poster(reddit, i, message, video, images, url, title)
 
     if crossPost == True:
-        submitID = Poster(reddit, toPromote, message, video, images, url, title)
+        submitID = Poster(reddit, toPromote, message,
+                          video, images, url, title)
         submitionn = reddit.submission(submitID)
         for i in subreddits:
             currentPath = RedgifsHome()
@@ -260,12 +275,15 @@ def PostOnReddit(title="Title Not Found", message="", url="", video = "", images
                     if f"{e.error_type}\n" not in errors:
                         currentPath = RedgifsHome()
                         with open("errors.txt", "a") as f:
-                            f.write(f"Not Posted in {i} due to {e.error_type} error")
+                            f.write(
+                                f"Not Posted in {i} due to {e.error_type} error\n")
                         home(currentPath)
                     elif str(e.error_type) == "NO_CROSSPOSTS":
                         Poster(reddit, i, message, video, images, url, title)
             else:
-                print(f"Skipped Sub Reddit {i} because it is has disabled the Cross Posting")
+                print(
+                    f"Skipped Sub Reddit {i} because it is has disabled the Cross Posting")
+
 
 def Poster(reddit, subreddit, message="", video="", images=[], url="", title="Title Not Found"):
     subreddit = reddit.subreddit(subreddit)
@@ -305,7 +323,8 @@ def Poster(reddit, subreddit, message="", video="", images=[], url="", title="Ti
         print(f"Skipped Sub Reddit {subreddit} because it is BlackListed")
     home(currentPath)
 
-def GetSubreddits(toPost = True):
+
+def GetSubreddits(toPost=True):
     reddit, config = readAndGetRedditAndBotConfig()
     my_subs = [
         subreddit.display_name for subreddit in reddit.user.subreddits(limit=None)]
@@ -350,7 +369,9 @@ def GetGifFromReddit(subReddit: str):
             isdiffrent = True
     return gif, title
 
-# change to the reddit secret api location 
+# change to the reddit secret api location
+
+
 def RedgifsHome():
     currentPath = os.getcwd()
     path = os.path.join(os.getcwd(), "Providers", "Reddit")
@@ -363,9 +384,12 @@ def RedgifsHome():
         os.chdir(os.path.join(os.getcwd(), "logs"))
     return currentPath
 
-# Move back to the original location 
+# Move back to the original location
+
+
 def home(currentPath: str):
     os.chdir(currentPath)
+
 
 def checkOrCreatePostedFile() -> str:
     currentPath = RedgifsHome()
@@ -406,6 +430,8 @@ def readAndGetRedditAndBotConfig():
     return reddit, config
 
 # Delete all the comments which are below to a particular karma level
+
+
 def DeleteCommentsBelowKarma(karma):
     reddit, config = readAndGetRedditAndBotConfig()
     # get particular reddit account's reddit comments
@@ -418,6 +444,8 @@ def DeleteCommentsBelowKarma(karma):
             link.delete()
 
 # Delete all the Posts which are below to a particular karma level
+
+
 def DeletePostsBelowKarma(karma):
     reddit, config = readAndGetRedditAndBotConfig()
     # get particular reddit account's reddit Posts
@@ -441,11 +469,13 @@ def checkOrCreateAFile(out_filename):
             urls = f.readlines()
     return urls
 
+
 def writeInPostedDB(url):
     currentPath = RedgifsHome()
     with open("Posted.txt", 'a') as f:
         f.write(f'{url}\n')
     home(currentPath)
+
 
 def askIfToPromote():
     subredditToPromote = ""
@@ -458,6 +488,7 @@ def askIfToPromote():
         subredditToPromote = clip.paste()
         crossPost = True
     return subredditToPromote, crossPost
+
 
 def PlayCustomizedVideo(url):
     reddit, config = readAndGetRedditAndBotConfig()

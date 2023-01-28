@@ -1,27 +1,34 @@
 import pymsgbox as pg
-import os, json
+import os
+import json
 import pyperclip as clip
 from GraphicalElements.OptionsMenu import GetRedditTag, GetUserTag
 from GraphicalElements.PostBox import PostBox
 from Providers.Reddit.Reddit import DeleteCommentsBelowKarma, DeletePostsBelowKarma, GetGifFromReddit, GetSubreddits, PlayCustomizedVideo, PlayFromRedGifs, PostOnReddit, PostOnRedditFromURL, Reddit, askIfToPromote, checkForError, getURLSfromSaved, playfromImagurAndVeddit, removeFromSaved, writeInPostedDB
 from Providers.Redgifs.Redgifs import RedGifs, getBestTag
-
+import platform
 from BotVersion import Bot_Version
 from components.ScriptUpdate.main import GetUpdate
 
-GetUpdate()
+# GetUpdate()
 
 # Open config file for this bot else create
 try:
     with open('config.json', 'r') as f:
         config = json.load(f)
 except FileNotFoundError:
-    BotName = pg.prompt("What do you want to call this BOT",
-                        "BOT Name", f"{os.getlogin()}'s BOT")
+    if platform.system() == "Windows":
+        BotName = pg.prompt("What do you want to call this BOT",
+                            "BOT Name", f"{os.getlogin()}'s BOT")
+    else:
+        BotName = pg.prompt("What do you want to call this BOT",
+                            "BOT Name", f"A Reddit Bot")
+
     username = pg.prompt("What's your Reddit Username",
-                        "Reddit username")
+                         "Reddit username")
     Version = Bot_Version
-    dataToJSON = {"Bot Name": BotName, "Version": Version, "username": username, "nsfw": False}
+    dataToJSON = {"Bot Name": BotName, "Version": Version,
+                  "username": username, "nsfw": False}
     with open("config.json", "a") as f:
         json.dump(dataToJSON, f, indent=4)
 finally:
@@ -47,41 +54,48 @@ if config["nsfw"] == False:
     options.pop(options.index("Automate"))
 
 # User Options to choose from
-option = pg.confirm(f"Reddit Automator", f'Posting on Reddit : {config["Bot Name"]}', buttons=options)
+option = pg.confirm(f"Reddit Automator",
+                    f'Posting on Reddit : {config["Bot Name"]}', buttons=options)
 
-# If User wants to automate each and every process 
+# If User wants to automate each and every process
 if str(option) == 'Automate':
     want = "Yes"
     while want == "Yes":
         tag = getBestTag(RedGifs.getAllTags())
         videoURL = RedGifs.GetFromRedgifs(tag)
         PlayFromRedGifs(videoURL)
-        want = pg.confirm("Do you want to change the Video??", "Confirmation", buttons=["Yes", "No"])
+        want = pg.confirm("Do you want to change the Video??",
+                          "Confirmation", buttons=["Yes", "No"])
     TitleOfThePost = f'#{tag}'
-    PostOnReddit(title = TitleOfThePost, url = videoURL)
+    PostOnReddit(title=TitleOfThePost, url=videoURL)
     writeInPostedDB(videoURL)
 
-# Delete Posts or Comments based on Karma 
+# Delete Posts or Comments based on Karma
 elif option == "Delete Post/Comments Based on Karma":
 
-    # option to choose what to delete 
-    secondOption = pg.confirm("What You Want To Delete??", f"Delete from Reddit", buttons=["Comments", "Posts"])
+    # option to choose what to delete
+    secondOption = pg.confirm("What You Want To Delete??",
+                              f"Delete from Reddit", buttons=["Comments", "Posts"])
 
     # If Comment selected
     if secondOption == "Comments":
-        karma = pg.prompt("Enter the Karma level to be maintained on Comments", "Delete Comments based on Karma") 
+        karma = pg.prompt(
+            "Enter the Karma level to be maintained on Comments", "Delete Comments based on Karma")
         try:
             DeleteCommentsBelowKarma(int(karma))
         except:
-            pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
+            pg.alert("Non-Integer Value Entered Program Exiting",
+                     config["Bot Name"])
 
     # If Post selected
     elif secondOption == "Posts":
-        karma = pg.prompt("Enter the Karma level to be maintained on Posts", "Delete Posts based on Karma")
+        karma = pg.prompt(
+            "Enter the Karma level to be maintained on Posts", "Delete Posts based on Karma")
         try:
             DeletePostsBelowKarma(int(karma))
         except:
-            pg.alert("Non-Integer Value Entered Program Exiting",config["Bot Name"])
+            pg.alert("Non-Integer Value Entered Program Exiting",
+                     config["Bot Name"])
 
 elif option == "Post by Own":
     optionsForPostByOwn = [
@@ -96,7 +110,8 @@ elif option == "Post by Own":
     if config["nsfw"] == False:
         optionsForPostByOwn.pop(optionsForPostByOwn.index("Mine Video"))
 
-    secondOption = pg.confirm("Posting to Reddit by Own", config["Bot Name"], buttons=optionsForPostByOwn)
+    secondOption = pg.confirm(
+        "Posting to Reddit by Own", config["Bot Name"], buttons=optionsForPostByOwn)
 
     if secondOption == "Mine Video":
         GetUserTag(RedGifs.getAllTags(), "Select the Tag from the List")
@@ -108,11 +123,13 @@ elif option == "Post by Own":
                                     'Yes', 'No', "Refresh"])
             PlayFromRedGifs(videoURL)
             want = wantToPlay
-        TitleOfThePost = pg.prompt("Enter the Title of the Post", "Enter the Title of the Post")
+        TitleOfThePost = pg.prompt(
+            "Enter the Title of the Post", "Enter the Title of the Post")
         subredditToPromote, crossPost = askIfToPromote()
-        PostOnReddit(title=TitleOfThePost, url=videoURL, crossPost=crossPost, toPromote=subredditToPromote)
+        PostOnReddit(title=TitleOfThePost, url=videoURL,
+                     crossPost=crossPost, toPromote=subredditToPromote)
         writeInPostedDB(videoURL)
-    
+
     elif secondOption == "From Reddit":
         GetRedditTag(GetSubreddits(toPost=False))
         sub = clip.paste()
@@ -124,8 +141,10 @@ elif option == "Post by Own":
                 PlayCustomizedVideo(videoURL)
             else:
                 clip.copy(videoURL)
-                pg.alert(f"Video can't be played in {config['Bot Name']}. It's Location has been copied to your clipboard.\nUse any browser's incognito mode to view the video.")
-                pg.alert("Software is paused while you watch the video.\nClick OK when you've watched the video.")
+                pg.alert(
+                    f"Video can't be played in {config['Bot Name']}. It's Location has been copied to your clipboard.\nUse any browser's incognito mode to view the video.")
+                pg.alert(
+                    "Software is paused while you watch the video.\nClick OK when you've watched the video.")
             want = pg.confirm("Post this Video on Reddit or fetch another one??",
                               "Confirm Dialogue", buttons=["Post", "Refresh"])
         CustomTitle = pg.confirm(
@@ -139,7 +158,8 @@ elif option == "Post by Own":
         else:
             exit()
         subredditToPromote, crossPost = askIfToPromote()
-        PostOnReddit(title = TitleOfThePost, url=videoURL, crossPost=crossPost, toPromote=subredditToPromote)
+        PostOnReddit(title=TitleOfThePost, url=videoURL,
+                     crossPost=crossPost, toPromote=subredditToPromote)
         writeInPostedDB(videoURL)
 
     elif secondOption == "Post a Particular Link":
@@ -149,13 +169,15 @@ elif option == "Post by Own":
     elif secondOption == "Post Text":
         PostBox("Enter the Text", False)
         text = str(clip.paste()).split('+')[0]
-        TitleOfThePost = pg.prompt(f"Enter the Title for this video", config["Bot Name"])
+        TitleOfThePost = pg.prompt(
+            f"Enter the Title for this video", config["Bot Name"])
         PostOnReddit(title=TitleOfThePost, message=text)
 
     elif secondOption == "Post Images":
         PostBox("Upload Images")
         TitleOfThePost, videoURL = str(clip.paste()).split("+")
-        videoURL = videoURL.replace("(", "").replace(")", "").replace(" ", "").replace("'", "").split(",")
+        videoURL = videoURL.replace("(", "").replace(")", "").replace(
+            " ", "").replace("'", "").split(",")
         images = []
         num = 0
         for i in videoURL:
@@ -164,7 +186,8 @@ elif option == "Post by Own":
             imageDict["image_path"] = i
             images.append(imageDict)
         subredditToPromote, crossPost = askIfToPromote()
-        PostOnReddit(images = images, title = TitleOfThePost, toPromote=subredditToPromote, crossPost=crossPost)
+        PostOnReddit(images=images, title=TitleOfThePost,
+                     toPromote=subredditToPromote, crossPost=crossPost)
 
     elif secondOption == "Post from Saved Vids":
         urls, idOfPosts = getURLSfromSaved()
@@ -173,7 +196,8 @@ elif option == "Post by Own":
         print("Got all the links from reddit")
         while toPost == "False":
             PlayCustomizedVideo(urls[urlIndex])
-            toPost = pg.confirm("Do you want to Post this??", "Post it??", buttons=["True", "False"])
+            toPost = pg.confirm("Do you want to Post this??",
+                                "Post it??", buttons=["True", "False"])
             if toPost == "False":
                 urlIndex += 1
         PostOnRedditFromURL(urls[urlIndex])

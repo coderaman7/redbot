@@ -2,10 +2,12 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename
 import pyperclip as clip
 
-# A Component for Postbox or for Selecting a Image and a Text Post of it 
-def PostBox(title, imageSelection = True):
+# A Component for Postbox or for Selecting a Image and a Text Post of it
 
-    # Root of the window and it's property 
+
+def PostBox(title, imageSelection=True):
+
+    # Root of the window and it's property
     root = Tk()
     if imageSelection == True:
         root.geometry("500x500")
@@ -15,19 +17,19 @@ def PostBox(title, imageSelection = True):
     root.resizable(width=False, height=False)
     PathOfImage = StringVar()
 
-    # Function to Handle the Get Image Parameter 
+    # Function to Handle the Get Image Parameter
     def GetImage():
         pathOfImage = askopenfilename(
             filetypes=[("Select Images", ".png .jpg .jpeg")], multiple=True)
         PathOfImage.set(pathOfImage)
 
-    # Dismiss this and move to the next step of Uploading 
+    # Dismiss this and move to the next step of Uploading
     def MoveToNext():
         Post = textbox.get(1.0, "end-1c")
         clip.copy(f'{Post}+{PathOfImage.get()}')
         root.destroy()
 
-    # Main Label Component and it's root widgets 
+    # Main Label Component and it's root widgets
     labl = Label(root, text=f"{title} in the below TextBox")
     labl.config(font=("Courier", 12))
     labl.place(x=80, y=20)
