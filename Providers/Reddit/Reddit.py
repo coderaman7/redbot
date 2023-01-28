@@ -256,33 +256,21 @@ def PostOnReddit(title="Title Not Found", message="", url="", video="", images=[
         submitionn = reddit.submission(submitID)
         for i in subreddits:
             currentPath = RedgifsHome()
-            noURLPosts = checkOrCreateAFile("noURLPosts.txt")
-            noMessagePosts = checkOrCreateAFile("noMessagePosts.txt")
-            noImagePosts = checkOrCreateAFile("noImagePosts.txt")
-            noVideoPosts = checkOrCreateAFile("noVideoPosts.txt")
-            noCrossPosts = checkOrCreateAFile("noCrossPosts.txt")
+            # noURLPosts = checkOrCreateAFile("noURLPosts.txt")
+            # noMessagePosts = checkOrCreateAFile("noMessagePosts.txt")
+            # noImagePosts = checkOrCreateAFile("noImagePosts.txt")
+            # noVideoPosts = checkOrCreateAFile("noVideoPosts.txt")
+            # noCrossPosts = checkOrCreateAFile("noCrossPosts.txt")
             home(currentPath)
-            if f"{i}\n" not in noURLPosts and f"{i}\n" not in noMessagePosts and f"{i}\n" not in noImagePosts and f"{i}\n" not in noVideoPosts:
-                try:
-                    submitionn.crosspost(i, nsfw=True, send_replies=False)
-                    print(f"Successfully Cross Posted in {i}")
-                except RedditAPIException as e:
-                    currentPath = RedgifsHome()
-                    with open("noCrossPosts.txt", "a") as f:
-                        f.write(f"{i}\n")
-                    errors = checkOrCreateAFile("errors.txt")
-                    home(currentPath)
-                    if f"{e.error_type}\n" not in errors:
-                        currentPath = RedgifsHome()
-                        with open("errors.txt", "a") as f:
-                            f.write(
-                                f"Not Posted in {i} due to {e.error_type} error\n")
-                        home(currentPath)
-                    elif str(e.error_type) == "NO_CROSSPOSTS":
-                        Poster(reddit, i, message, video, images, url, title)
-            else:
-                print(
-                    f"Skipped Sub Reddit {i} because it is has disabled the Cross Posting")
+            try:
+                submitionn.crosspost(i, nsfw=True, send_replies=False)
+                print(f"Successfully Cross Posted in {i}")
+            except RedditAPIException as e:
+                currentPath = RedgifsHome()
+                with open(f"{e.error_type}.txt", "a") as f:
+                    f.write(f"Wasn't able to Cross Post due to {i}\n")
+                home(currentPath)
+                Poster(reddit, i, message, video, images, url, title)
 
 
 def Poster(reddit, subreddit, message="", video="", images=[], url="", title="Title Not Found"):
