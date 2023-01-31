@@ -191,6 +191,7 @@ elif option == "Post by Own":
 
     elif secondOption == "Post from Saved Vids":
         urls, idOfPosts = getURLSfromSaved()
+        print(len(urls))
         urlIndex = 0
         toPost = "False"
         print("Got all the links from reddit")

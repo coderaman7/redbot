@@ -244,8 +244,31 @@ def checkForError(tocheckfor, dynamicVar):
 
 def PostOnReddit(title="Title Not Found", message="", url="", video="", images=[], crossPost=False, toPromote=""):
     reddit, config = readAndGetRedditAndBotConfig()
-    GetRedditSub(GetSubreddits())
-    subreddits = str(clip.paste()).split("+")[:-1]
+    try:
+        currentPath = RedgifsHome()
+        with open("History_Of_Subreddits.txt", 'r') as f:
+            subreddits = f.readlines()
+        optionOfSubreddit = pg.confirm("Do you want to Change this??",
+                   "Confirm History??", buttons=["True", "False"])
+        home(currentPath)
+        if optionOfSubreddit == "True":
+            raise FileNotFoundError
+        else:
+            subreddits = [str(x).replace("\n", "") for x in subreddits]
+    except:
+        currentPath = RedgifsHome()
+        with open("History_Of_Subreddits.txt", 'w') as f:
+            f.write("")
+        print("Created a History DataBase")
+        home(currentPath)
+        GetRedditSub(GetSubreddits())
+        subreddits = str(clip.paste()).split("+")[:-1]
+        currentPath = RedgifsHome()
+        with open("History_Of_Subreddits.txt", 'w') as f:
+            for i in subreddits:
+                f.write(f"{i}\n")
+        home(currentPath)
+
     if crossPost == False:
         for i in subreddits:
             Poster(reddit, i, message, video, images, url, title)
@@ -256,11 +279,6 @@ def PostOnReddit(title="Title Not Found", message="", url="", video="", images=[
         submitionn = reddit.submission(submitID)
         for i in subreddits:
             currentPath = RedgifsHome()
-            # noURLPosts = checkOrCreateAFile("noURLPosts.txt")
-            # noMessagePosts = checkOrCreateAFile("noMessagePosts.txt")
-            # noImagePosts = checkOrCreateAFile("noImagePosts.txt")
-            # noVideoPosts = checkOrCreateAFile("noVideoPosts.txt")
-            # noCrossPosts = checkOrCreateAFile("noCrossPosts.txt")
             home(currentPath)
             try:
                 submitionn.crosspost(i, nsfw=True, send_replies=False)
@@ -275,40 +293,37 @@ def PostOnReddit(title="Title Not Found", message="", url="", video="", images=[
 
 def Poster(reddit, subreddit, message="", video="", images=[], url="", title="Title Not Found"):
     subreddit = reddit.subreddit(subreddit)
-    reddit.validate_on_submit = True
+    reddit.validate_on_submit = False
     currentPath = RedgifsHome()
-    noURLPosts = checkOrCreateAFile("noURLPosts.txt")
-    noMessagePosts = checkOrCreateAFile("noMessagePosts.txt")
-    noImagePosts = checkOrCreateAFile("noImagePosts.txt")
-    noVideoPosts = checkOrCreateAFile("noVideoPosts.txt")
-    if f"{subreddit}\n" not in noURLPosts and f"{subreddit}\n" not in noMessagePosts and f"{subreddit}\n" not in noImagePosts and f"{subreddit}\n" not in noVideoPosts:
-        submitElem = ""
+    submitElem = ""
+    try:
         if message == "" and video == "" and len(images) == 0 and url != "":
             submitElem = subreddit.submit(title, url=url, nsfw=True)
         elif url == "" and video == "" and len(images) == 0 and message != "":
             try:
                 submitElem = subreddit.submit(
                     title, selftext=message, nsfw=False)
-            except:
-                with open("noMessagePosts.txt", "a") as f:
+            except RedditAPIException as e:
+                with open(f"{e.error_type}.txt", "a") as f:
                     f.write(f"{subreddit}\n")
         elif url == "" and message == "" and video == "" and len(images) != 0:
             try:
                 submitElem = subreddit.submit_gallery(title, message)
-            except:
-                with open("noImagePosts.txt", "a") as f:
+            except RedditAPIException as e:
+                with open(f"{e.error_type}.txt", "a") as f:
                     f.write(f"{subreddit}\n")
         elif url == "" and message == "" and len(images) == 0 and video != "":
             try:
                 submitElem = subreddit.submit_video(title, video)
-            except:
-                with open("noVideoPosts.txt", "a") as f:
+            except RedditAPIException as e:
+                with open(f"{e.error_type}.txt", "a") as f:
                     f.write(f"{subreddit}\n")
-        print(f"Successfully Posted in {subreddit}")
-        home(currentPath)
-        return submitElem
-    else:
-        print(f"Skipped Sub Reddit {subreddit} because it is BlackListed")
+    except RedditAPIException as e:
+        with open(f"{e.error_type}.txt", "a") as f:
+            f.write(f"{subreddit}\n")
+    print(f"Successfully Posted in {subreddit}")
+    home(currentPath)
+    return submitElem
     home(currentPath)
 
 
