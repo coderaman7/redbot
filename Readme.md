@@ -12,7 +12,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/coderaman07/redbot">
+  <a href="https://github.com/coderaman7/redbot">
     <img src="assets/logo.png" alt="Logo" width="250" height="80">
   </a>
 
@@ -21,14 +21,14 @@
   <p align="center">
     A Cross Platform Desktop Application which enables a Reddit user to automate NSFW gifs posting from Redgifs directly from Desktop wihtout opening redgifs or reddit on multiple Sub Reddits and also it enables a user to promote a particular Sub Reddits.
     <br />
-    <a href="https://github.com/coderaman07/redbot"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/coderaman7/redbot"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/coderaman07/redbot">View Demo</a>
+    <a href="https://github.com/coderaman7/redbot">View Demo</a>
     ·
-    <a href="https://github.com/coderaman07/redbot/issues">Report Bug</a>
+    <a href="https://github.com/coderaman7/redbot/issues">Report Bug</a>
     ·
-    <a href="https://github.com/coderaman07/redbot/issues">Request Feature</a>
+    <a href="https://github.com/coderaman7/redbot/issues">Request Feature</a>
   </p>
 </div>
 
@@ -65,8 +65,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://github.com/coderaman07/redbot)
-[![Product Name Screen Shot][product-screenshot2]](https://github.com/coderaman07/redbot)
+[![Product Name Screen Shot][product-screenshot]](https://github.com/coderaman7/redbot)
+[![Product Name Screen Shot][product-screenshot2]](https://github.com/coderaman7/redbot)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -100,7 +100,7 @@ This is an example of how to list things you need to use the software and how to
 1. Get your Reddit API Key at [https://www.reddit.com/prefs/apps/](https://www.reddit.com/prefs/apps/)
 2. Clone the repo
    ```sh
-   git clone https://github.com/coderaman07/redbot.git
+   git clone https://github.com/coderaman7/redbot.git
    ```
 3. Install NPM packages
    ```sh
@@ -131,11 +131,13 @@ This project is used to automate Reddit and Redgifs so that you can grow up your
   - [x] Post a Particular URL
   - [x] Post Multiple Images on Reddit without even opening a single browser
   - [x] Post Text to Multiple Sub reddits
+  - [x] Post from Saved Vids/Posts
 - [x] Delete your Post or Comments based on a set amount of Likes/Karma
     - [x] This set amount can be changable
 - [x] Download Saved Vids from Reddit
+- [x] Post on Subreddites posted last time
 
-See the [open issues](https://github.com/coderaman07/redbot/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/coderaman7/redbot/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -176,25 +178,25 @@ Twitter - [@coderaman7](https://twitter.com/coderaman7)
 Email - bugsoverflow@gmail.com  
 Website Connect - https://codeitdown.vercel.app/contact
 
-Project Link: [https://github.com/coderaman07/redbot](https://github.com/coderaman07/redbot)
+Project Link: [https://github.com/coderaman7/redbot](https://github.com/coderaman7/redbot)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/coderaman07/redbot.svg?style=for-the-badge
-[contributors-url]: https://github.com/coderaman07/redbot/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/coderaman07/redbot.svg?style=for-the-badge
-[forks-url]: https://github.com/coderaman07/redbot/network/members
-[stars-shield]: https://img.shields.io/github/stars/coderaman07/redbot.svg?style=for-the-badge
-[stars-url]: https://github.com/coderaman07/redbot/stargazers
-[issues-shield]: https://img.shields.io/github/issues/coderaman07/redbot.svg?style=for-the-badge
-[issues-url]: https://github.com/coderaman07/redbot/issues
-[license-shield]: https://img.shields.io/github/license/coderaman07/redbot.svg?style=for-the-badge
-[license-url]: https://github.com/coderaman07/redbot/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/coderaman7/redbot.svg?style=for-the-badge
+[contributors-url]: https://github.com/coderaman7/redbot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/coderaman7/redbot.svg?style=for-the-badge
+[forks-url]: https://github.com/coderaman7/redbot/network/members
+[stars-shield]: https://img.shields.io/github/stars/coderaman7/redbot.svg?style=for-the-badge
+[stars-url]: https://github.com/coderaman7/redbot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/coderaman7/redbot.svg?style=for-the-badge
+[issues-url]: https://github.com/coderaman7/redbot/issues
+[license-shield]: https://img.shields.io/github/license/coderaman7/redbot.svg?style=for-the-badge
+[license-url]: https://github.com/coderaman7/redbot/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/coderaman07
+[linkedin-url]: https://linkedin.com/in/coderaman7
 
 
 [product-screenshot]: assets/screen.png
