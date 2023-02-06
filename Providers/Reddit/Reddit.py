@@ -256,7 +256,6 @@ def PostOnReddit(title="Title Not Found", message="", url="", video="", images=[
         else:
             subreddits = [str(x).replace("\n", "") for x in subreddits]
     except:
-        currentPath = RedgifsHome()
         with open("History_Of_Subreddits.txt", 'w') as f:
             f.write("")
         print("Created a History DataBase")
