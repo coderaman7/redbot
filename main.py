@@ -93,7 +93,8 @@ elif option == "Delete Post/Comments Based on Karma":
             "Enter the Karma level to be maintained on Posts", "Delete Posts based on Karma")
         try:
             DeletePostsBelowKarma(int(karma))
-        except:
+        except Exception as e:
+            print(e)
             pg.alert("Non-Integer Value Entered Program Exiting",
                      config["Bot Name"])
 

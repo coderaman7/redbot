@@ -10,7 +10,7 @@ import pymsgbox as pg
 from redvid import Downloader
 import requests
 from GraphicalElements.OptionsMenu import GetRedditSub, GetUserTag
-from components.videoPlayer import PlayVideo
+# from components.videoPlayer import PlayVideo
 import pyperclip as clip
 from praw.exceptions import RedditAPIException
 
@@ -215,7 +215,8 @@ def PlayFromRedGifs(url):
         choice = pg.confirm("Want to Play the Video??",
                             "Play it??", buttons=["Yes", "No"])
         if choice == "Yes":
-            PlayVideo('tempvid.mp4')
+            # PlayVideo('tempvid.mp4')
+            pass
         os.remove("tempVid.mp4")
     else:
         print(redgif_id)
@@ -225,7 +226,7 @@ def playfromImagurAndVeddit(url):
     downloadRedVid = Downloader(max_q=True)
     downloadRedVid.url = url
     downloadRedVid.download()
-    PlayVideo(downloadRedVid.file_name)
+    # PlayVideo(downloadRedVid.file_name)
     # os.remove(str(downloadRedVid).split("/")[:-1])
     print(str(downloadRedVid).split("/")[:-1])
     # To work on it
